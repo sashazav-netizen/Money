@@ -1,90 +1,76 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ניהול כספי הבית - משודרג</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root {
-    --bg-color: #f9fafc;
-    --card-bg: #ffffff;
-    --primary: #2c3e50;
-    --income: #27ae60;
-    --expense: #e74c3c;
-    --fixed: #f39c12;
-    --border-color: #ddd;
-    --hover-bg: #f0f4f8;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול כספי הבית - אלכסנדר</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f9fafc;
+            --card-bg: #ffffff;
+            --primary: #2c3e50;
+            --income: #27ae60;
+            --expense: #e74c3c;
+            --fixed: #f39c12;
+            --border-color: #ddd;
+        }
 
-body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background-color: var(--bg-color);
-    margin: 0; padding: 10px;
-    color: #333;
-    display: flex; flex-direction: column; min-height: 100vh;
-    transition: background 0.3s;
-}
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0; padding: 10px; color: #333;
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
 
-.container { max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
+        .container { max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
 
-header { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 10px 0; flex-wrap: wrap;}
-.header-icon { width: 35px; height: 35px; transition: transform 0.2s; }
-.header-icon:hover { transform: scale(1.1); }
-h1 { margin: 0; font-size: 1.6rem; color: var(--primary); text-align:center;}
+        header { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 10px 0; }
+        .header-icon { width: 35px; height: 35px; transition: transform 0.2s; }
+        .header-icon:hover { transform: scale(1.1); }
+        h1 { margin: 0; font-size: 1.6rem; color: var(--primary); }
 
-.month-nav {
-    display: flex; justify-content: center; align-items: center; gap: 20px;
-    background: var(--primary); color: white; padding: 8px; border-radius: 8px; margin-bottom: 10px;
-}
-.nav-btn { 
-    background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; padding: 5px 15px; border-radius: 4px; font-weight: bold; 
-}
-.nav-btn:hover { background: rgba(255,255,255,0.4); }
+        .month-nav {
+            display: flex; justify-content: center; align-items: center; gap: 20px;
+            background: var(--primary); color: white; padding: 8px; border-radius: 8px; margin-bottom: 10px;
+        }
+        .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; padding: 5px 15px; border-radius: 4px; font-weight: bold; }
+        .nav-btn:hover { background: rgba(255,255,255,0.4); }
 
-.grid { display: grid; grid-template-columns: 320px 1fr; gap: 15px; flex-grow: 1; }
-.card { background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 10px; transition: transform 0.2s; }
-.card h3 { margin: 0 0 12px 0; font-size: 1rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 15px; flex-grow: 1; }
+        .card { background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 10px; }
+        .card h3 { margin: 0 0 12px 0; font-size: 1rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
 
-.balance-display { border: 2px solid var(--primary); text-align: center; padding: 10px; border-radius: 12px; margin-bottom: 15px; background: white; }
-.balance-val { font-size: 1.4rem; font-weight: bold; display: block; }
-.carry-over { font-size: 0.9rem; color: #666; margin-top: 5px; border-top: 1px dashed #eee; padding-top: 5px; }
+        .balance-display { border: 2px solid var(--primary); text-align: center; padding: 10px; border-radius: 12px; margin-bottom: 15px; background: white; }
+        .balance-val { font-size: 1.4rem; font-weight: bold; display: block; }
+        .carry-over { font-size: 0.9rem; color: #666; margin-top: 5px; border-top: 1px dashed #eee; padding-top: 5px; }
 
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.full-width { grid-column: span 2; }
-input, select, button { padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; }
+        .summary { display:flex; justify-content: space-between; margin-bottom:10px; font-size: 13px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .summary div span { font-weight:bold; }
 
-.btn-submit { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; }
-.btn-submit:hover { background: #1f2d3d; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .full-width { grid-column: span 2; }
+        input, select, button { padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; }
 
-.list-section { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-.scroll-area { 
-    flex-grow: 1; 
-    overflow-y: auto; 
-    max-height: 400px; 
-    padding-left: 5px; 
-}
+        .btn-submit { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-submit:hover { background: #1f2d3d; }
 
-.item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; background: #fefefe; border-radius: 8px; border-right: 5px solid #ccc; font-size: 13px; }
-.income { border-right-color: var(--income); }
-.expense { border-right-color: var(--expense); }
-.fixed { border-right-color: var(--fixed); }
+        .scroll-area { flex-grow: 1; overflow-y: auto; max-height: 400px; padding-left: 5px; }
 
-.progress-bg { background: #eee; border-radius: 10px; height: 8px; margin: 10px 0; overflow: hidden; }
-.progress-fill { height: 100%; width: 0%; transition: width 0.6s ease; background: var(--fixed); }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; background: #fefefe; border-radius: 8px; border-right: 5px solid #ccc; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .income { border-right-color: var(--income); }
+        .expense { border-right-color: var(--expense); }
+        .fixed { border-right-color: var(--fixed); }
 
-.chart-box { position: relative; height: 150px; width: 100%; }
+        .progress-bg { background: #eee; border-radius: 10px; height: 8px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.6s ease; background: var(--fixed); }
 
-.summary { display:flex; justify-content: space-between; margin-bottom:10px; font-size: 14px; }
-.summary div span { font-weight:bold; margin-left:5px; }
+        .chart-box { position: relative; width: 100%; }
 
-footer { text-align: center; font-size: 11px; color: #888; padding: 10px; }
+        footer { text-align: center; font-size: 11px; color: #888; padding: 20px 10px; }
 
-@media (max-width: 768px) {
-    .grid { grid-template-columns: 1fr; }
-    .summary { flex-direction: column; gap:5px;}
-}
-</style>
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .summary { flex-direction: column; gap:5px; } }
+    </style>
 </head>
 <body>
 
@@ -112,13 +98,13 @@ footer { text-align: center; font-size: 11px; color: #888; padding: 10px; }
             </div>
 
             <div class="summary">
-                <div>הכנסות: <span id="totalIncome">₪0</span></div>
-                <div>הוצאות: <span id="totalExpense">₪0</span></div>
+                <div>הכנסות: <span id="totalIncome" style="color:var(--income)">₪0</span></div>
+                <div>הוצאות: <span id="totalExpense" style="color:var(--expense)">₪0</span></div>
                 <div>נטו: <span id="netBalance">₪0</span></div>
             </div>
 
             <div class="card">
-                <h3>הוספת תנועה</h3>
+                <h3>הוספה / עריכת תנועה</h3>
                 <div class="form-grid">
                     <input type="text" id="desc" placeholder="תיאור" class="full-width">
                     <input type="number" id="amt" placeholder="סכום">
@@ -127,7 +113,7 @@ footer { text-align: center; font-size: 11px; color: #888; padding: 10px; }
                         <option value="expense">הוצאה</option>
                         <option value="fixed">קבועה</option>
                     </select>
-                    <button class="btn-submit full-width" onclick="addItem()">הוסף / עדכן</button>
+                    <button class="btn-submit full-width" id="submitBtn" onclick="addItem()">הוסף תנועה</button>
                 </div>
             </div>
 
@@ -137,9 +123,9 @@ footer { text-align: center; font-size: 11px; color: #888; padding: 10px; }
                     אחוז מההכנסה: <span id="fixedText" style="font-weight:bold">0%</span>
                     <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
                 </div>
-                <div class="chart-box"><canvas id="mainChart"></canvas></div>
-                <div style="display:flex; gap:5px; margin-top:10px;">
-                    <button onclick="exportData()" style="flex:1; font-size:10px; cursor:pointer;">גיבוי</button>
+                <div class="chart-box" style="height:140px;"><canvas id="mainChart"></canvas></div>
+                <div style="display:flex; gap:5px; margin-top:15px;">
+                    <button onclick="exportData()" style="flex:1; font-size:10px; cursor:pointer;">גיבוי JSON</button>
                     <button onclick="document.getElementById('fileIn').click()" style="flex:1; font-size:10px; cursor:pointer;">שחזור</button>
                     <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
                 </div>
@@ -147,10 +133,14 @@ footer { text-align: center; font-size: 11px; color: #888; padding: 10px; }
         </aside>
 
         <main class="list-section">
-            <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+            <div class="card" style="display: flex; flex-direction: column;">
                 <h3>פירוט תנועות - <span id="labelMonth"></span></h3>
                 <div id="list" class="scroll-area"></div>
-                <div class="chart-box" style="margin-top:15px; height: 200px;"><canvas id="monthlyChart"></canvas></div>
+            </div>
+            
+            <div class="card">
+                <h3>מבט שנתי (השוואת חודשים)</h3>
+                <div class="chart-box" style="height: 220px;"><canvas id="monthlyChart"></canvas></div>
             </div>
         </main>
     </div>
@@ -164,13 +154,15 @@ let viewDate = new Date();
 let mainChart, monthlyChart;
 let editingId = null;
 
-function initChart() {
+function initCharts() {
+    // גרף העוגה
     mainChart = new Chart(document.getElementById('mainChart'), {
         type: 'doughnut',
         data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#27ae60','#e74c3c','#f39c12'], borderWidth: 1 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }, cutout: '70%' }
     });
 
+    // גרף העמודות השנתי - כאן הוספתי את ה-Stacked
     monthlyChart = new Chart(document.getElementById('monthlyChart'), {
         type: 'bar',
         data: { labels: [], datasets: [
@@ -178,19 +170,28 @@ function initChart() {
             { label:'הוצאה', backgroundColor:'#e74c3c', data:[] },
             { label:'קבועה', backgroundColor:'#f39c12', data:[] }
         ]},
-        options: { responsive:true, maintainAspectRatio: false, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}} }
+        options: { 
+            responsive:true, 
+            maintainAspectRatio: false, 
+            plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{size:10} } } }, 
+            scales:{ 
+                y:{ beginAtZero:true, stacked: true }, // עמודות נערמות
+                x:{ stacked: true } 
+            } 
+        }
     });
 }
 
 function addItem() {
     const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
     const amtVal = parseFloat(a.value);
-    if(!d.value || isNaN(amtVal) || amtVal===0){ alert('אנא הכנס תיאור וסכום תקינים'); return; }
+    if(!d.value || isNaN(amtVal) || amtVal <= 0){ alert('נא להזין תיאור וסכום תקין'); return; }
 
     if(editingId){
         const item = data.find(i=>i.id===editingId);
         if(item) { item.desc = d.value; item.amt = amtVal; item.type = t.value; }
         editingId = null;
+        document.getElementById('submitBtn').innerText = "הוסף תנועה";
     } else {
         data.push({ id: Date.now(), desc:d.value, amt:amtVal, type:t.value, date:viewDate.toISOString() });
     }
@@ -204,12 +205,13 @@ function editItem(id){
     document.getElementById('desc').value = item.desc;
     document.getElementById('amt').value = item.amt;
     document.getElementById('type').value = item.type;
+    document.getElementById('submitBtn').innerText = "עדכן תנועה";
     editingId = id;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function deleteItem(id){
-    if(!confirm('למחוק פריט זה?')) return;
+    if(!confirm('למחוק את התנועה הזו?')) return;
     data = data.filter(i=>i.id!==id);
     save();
 }
@@ -219,6 +221,7 @@ function moveMonth(n){
     editingId = null;
     document.getElementById('desc').value = '';
     document.getElementById('amt').value = '';
+    document.getElementById('submitBtn').innerText = "הוסף תנועה";
     render(); 
 }
 
@@ -233,63 +236,56 @@ function render(){
     const currentData = data.filter(i=>{ const d=new Date(i.date); return d.getMonth()===m && d.getFullYear()===y; });
     const list=document.getElementById('list');
     list.innerHTML='';
-    const fragment = document.createDocumentFragment();
-
+    
     let totals={income:0,expense:0,fixed:0};
+    
     currentData.slice().sort((a,b)=>b.id-a.id).forEach(i=>{
         totals[i.type]+=i.amt;
-        const itemEl=document.createElement('div');
-        itemEl.className=`item ${i.type}`;
-        itemEl.innerHTML=`<span>${i.desc}</span>
-        <div style="display:flex;align-items:center;gap:10px;">
-            <span dir="ltr" style="font-weight:bold">${i.type==='income'?'+':'-'} ₪${i.amt.toLocaleString()}</span>
-            <button onclick="editItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#555;" aria-label="ערוך פריט">✏️</button>
-            <button onclick="deleteItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#ddd;" aria-label="מחק פריט">🗑</button>
-        </div>`;
-        fragment.appendChild(itemEl);
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `item ${i.type}`;
+        itemDiv.innerHTML = `
+            <span>${i.desc}</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span dir="ltr" style="font-weight:bold">${i.type==='income'?'+':'-'} ₪${i.amt.toLocaleString()}</span>
+                <button onclick="editItem(${i.id})" style="border:none;background:none;cursor:pointer;font-size:14px;">✏️</button>
+                <button onclick="deleteItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#ddd;">🗑</button>
+            </div>`;
+        list.appendChild(itemDiv);
     });
-    list.appendChild(fragment);
 
     const currentBal = totals.income-(totals.expense+totals.fixed);
     const balEl = document.getElementById('balanceVal');
     balEl.innerText=`₪ ${currentBal.toLocaleString()}`;
-    balEl.style.color=currentBal<0?'var(--expense)':'var(--income)';
+    balEl.style.color=currentBal < 0 ? 'var(--expense)' : 'var(--income)';
 
     const accumulatedBal = data.reduce((acc,i)=>{
         const d=new Date(i.date);
         const itemMonth=d.getMonth() + (d.getFullYear()*12);
         const viewMonth=m+(y*12);
-        if(itemMonth<=viewMonth){ return i.type==='income'?acc+i.amt:acc-i.amt; }
-        return acc;
+        return (itemMonth <= viewMonth) ? (i.type==='income'?acc+i.amt:acc-i.amt) : acc;
     },0);
+    
     const totalAccEl=document.getElementById('totalAccumulated');
     totalAccEl.innerText=`₪ ${accumulatedBal.toLocaleString()}`;
     totalAccEl.style.color=accumulatedBal<0?'var(--expense)':'var(--income)';
 
-    document.getElementById('totalIncome').innerText=`₪ ${totals.income.toLocaleString()}`;
-    document.getElementById('totalExpense').innerText=`₪ ${totals.expense.toLocaleString()}`;
-    document.getElementById('netBalance').innerText=`₪ ${currentBal.toLocaleString()}`;
+    document.getElementById('totalIncome').innerText=`₪${totals.income.toLocaleString()}`;
+    document.getElementById('totalExpense').innerText=`₪${(totals.expense+totals.fixed).toLocaleString()}`;
+    document.getElementById('netBalance').innerText=`₪${currentBal.toLocaleString()}`;
 
     if(mainChart){ mainChart.data.datasets[0].data=[totals.income,totals.expense,totals.fixed]; mainChart.update(); }
 
-    const fixP = totals.income>0?Math.floor((totals.fixed/totals.income)*100):0;
+    const fixP = totals.income > 0 ? Math.floor((totals.fixed/totals.income)*100) : 0;
     document.getElementById('fixedText').innerText=fixP+'%';
     document.getElementById('fixedProgress').style.width=Math.min(fixP,100)+'%';
 
-    // גרף חודשי משודרג עם הכנסה/הוצאה/קבועה לכל חודש
+    // עדכון גרף שנתי
     const monthLabels=[]; const incomeData=[]; const expenseData=[]; const fixedData=[];
-    for(let i=0;i<12;i++){
+    for(let i=0; i<12; i++){
         monthLabels.push(months[i]);
-        const monthItems=data.filter(d=> {
-            const dt = new Date(d.date);
-            return dt.getMonth()===i && dt.getFullYear()===y;
-        });
+        const mItems=data.filter(d=> { const dt=new Date(d.date); return dt.getMonth()===i && dt.getFullYear()===y; });
         let inc=0, exp=0, fix=0;
-        monthItems.forEach(it=>{ 
-            if(it.type==='income') inc+=it.amt; 
-            else if(it.type==='expense') exp+=it.amt; 
-            else if(it.type==='fixed') fix+=it.amt;
-        });
+        mItems.forEach(it=>{ if(it.type==='income') inc+=it.amt; else if(it.type==='expense') exp+=it.amt; else if(it.type==='fixed') fix+=it.amt; });
         incomeData.push(inc); expenseData.push(exp); fixedData.push(fix);
     }
     if(monthlyChart){
@@ -303,20 +299,17 @@ function render(){
 
 function exportData(){
     const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([JSON.stringify(data)], {type: "application/json"}));
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(data)], {type:"application/json"}));
     a.download="budget_backup.json"; a.click();
 }
 
 function importData(e){
     const r=new FileReader();
-    r.onload=(ev)=>{ try{ data=JSON.parse(ev.target.result); save(); } catch(err){ alert('קובץ לא חוקי'); } };
+    r.onload=(ev)=>{ try{ data=JSON.parse(ev.target.result); save(); } catch(e){ alert('קובץ לא תקין'); } };
     r.readAsText(e.target.files[0]);
 }
 
-window.onload = () => {
-    initChart();
-    render();
-};
+window.onload = () => { initCharts(); render(); };
 </script>
 
 </body>
