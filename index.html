@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול כספי הבית - קומפקטי עם אימות</title>
+    <title>ניהול כספי הבית - עם יעד חיסכון</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -13,6 +13,7 @@
             --income-color: #27ae60;
             --expense-color: #e74c3c;
             --fixed-color: #f39c12;
+            --savings-color: #3498db;
             --text-main: #2c3e50;
             --error-color: #d63031;
         }
@@ -54,6 +55,23 @@
             margin-bottom: 15px;
         }
 
+        /* עיצוב יעד חיסכון */
+        .savings-goal-box { margin-bottom: 15px; }
+        .progress-container {
+            background: #eee;
+            border-radius: 10px;
+            height: 12px;
+            width: 100%;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: var(--savings-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+
         .input-stack { display: flex; flex-direction: column; gap: 8px; }
         
         input, select, button {
@@ -61,22 +79,12 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
-            transition: border-color 0.3s;
         }
 
-        /* עיצוב שגיאה לשדות */
         input.error { border-color: var(--error-color); background-color: #fff5f5; }
-
-        #error-msg {
-            color: var(--error-color);
-            font-size: 12px;
-            font-weight: bold;
-            display: none; /* מוסתר כברירת מחדל */
-            margin-bottom: 5px;
-        }
+        #error-msg { color: var(--error-color); font-size: 11px; display: none; margin-bottom: 5px; }
 
         .btn-add { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 5px; }
-        .btn-add:active { transform: scale(0.98); }
 
         .transaction-list { max-height: 480px; overflow-y: auto; }
 
@@ -89,7 +97,6 @@
             border-radius: 4px;
             background: #fff;
             border-right: 4px solid #ccc;
-            font-size: 13.5px;
         }
 
         .item-income { border-right-color: var(--income-color); }
@@ -98,18 +105,12 @@
 
         .amount-text { font-weight: bold; margin-right: 15px; min-width: 80px; text-align: left; }
         .delete-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; }
-        .delete-btn:hover { color: var(--expense-color); }
 
-        .chart-wrapper { width: 100%; max-width: 220px; margin: 0 auto; height: 180px; }
+        .chart-wrapper { width: 100%; height: 180px; }
         .actions { display: flex; gap: 5px; margin-top: 10px; }
         .btn-small { flex: 1; padding: 5px; font-size: 11px; background: #eee; cursor: pointer; border: 1px solid #ddd; }
 
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.75em;
-            color: #999;
-        }
+        footer { text-align: center; margin-top: 30px; font-size: 0.75em; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
 
         @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
     </style>
@@ -126,11 +127,20 @@
                 <div id="total-balance" style="font-size: 1.4em; font-weight: bold;">₪ 0</div>
             </div>
 
+            <div class="card savings-goal-box">
+                <h3 style="font-size: 1rem;">יעד חיסכון</h3>
+                <input type="number" id="savings-goal-input" placeholder="הגדר יעד (₪)" onchange="updateSavingsGoal()" style="width: 80%; margin-bottom: 5px;">
+                <div class="progress-container">
+                    <div id="savings-progress" class="progress-bar"></div>
+                </div>
+                <div id="savings-status" style="font-size: 11px; color: #666;">0% מהיעד הושג</div>
+            </div>
+
             <div class="card">
                 <h3>הוספה מהירה</h3>
                 <div id="error-msg">⚠️ נא למלא תיאור וסכום תקין</div>
                 <div class="input-stack">
-                    <input type="text" id="desc" placeholder="תיאור (למשל: סופר)">
+                    <input type="text" id="desc" placeholder="תיאור">
                     <input type="number" id="amount" placeholder="סכום">
                     <select id="type">
                         <option value="income">הכנסה</option>
@@ -147,14 +157,12 @@
             </div>
 
             <div class="card">
-                <div class="chart-wrapper">
-                    <canvas id="budgetChart"></canvas>
-                </div>
+                <div class="chart-wrapper"><canvas id="budgetChart"></canvas></div>
             </div>
         </aside>
 
         <main>
-            <div class="card" style="min-height: 520px;">
+            <div class="card" style="min-height: 550px;">
                 <h3>פירוט תנועות</h3>
                 <div id="list" class="transaction-list"></div>
             </div>
@@ -168,6 +176,7 @@
 
 <script>
     let transactions = JSON.parse(localStorage.getItem('home_budget_data')) || [];
+    let savingsGoal = parseFloat(localStorage.getItem('home_budget_goal')) || 0;
     let myChart = null;
 
     function initChart() {
@@ -185,10 +194,17 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } },
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
                 cutout: '70%'
             }
         });
+    }
+
+    function updateSavingsGoal() {
+        const val = parseFloat(document.getElementById('savings-goal-input').value);
+        savingsGoal = isNaN(val) ? 0 : val;
+        localStorage.setItem('home_budget_goal', savingsGoal);
+        updateUI();
     }
 
     function addTransaction() {
@@ -200,30 +216,19 @@
         const amount = parseFloat(amountEl.value);
         const type = document.getElementById('type').value;
 
-        // איפוס שגיאות קודמות
         descEl.classList.remove('error');
         amountEl.classList.remove('error');
         errorMsg.style.display = 'none';
 
-        // בדיקת תקינות
-        let hasError = false;
-        if (!desc) {
-            descEl.classList.add('error');
-            hasError = true;
-        }
-        if (isNaN(amount) || amount <= 0) {
-            amountEl.classList.add('error');
-            hasError = true;
-        }
-
-        if (hasError) {
+        if (!desc || isNaN(amount) || amount <= 0) {
+            if (!desc) descEl.classList.add('error');
+            if (isNaN(amount) || amount <= 0) amountEl.classList.add('error');
             errorMsg.style.display = 'block';
             return;
         }
 
         transactions.push({ id: Date.now(), desc, amount, type });
         saveAndRefresh();
-        
         descEl.value = '';
         amountEl.value = '';
     }
@@ -259,6 +264,21 @@
         const balance = totals.income - (totals.expense + totals.fixed);
         document.getElementById('total-balance').innerText = `₪ ${balance.toLocaleString()}`;
 
+        // עדכון יעד חיסכון
+        document.getElementById('savings-goal-input').value = savingsGoal || '';
+        const progressEl = document.getElementById('savings-progress');
+        const statusEl = document.getElementById('savings-status');
+        
+        if (savingsGoal > 0) {
+            let percentage = (balance / savingsGoal) * 100;
+            percentage = Math.min(Math.max(percentage, 0), 100); // הגבלה בין 0 ל-100
+            progressEl.style.width = percentage + '%';
+            statusEl.innerText = `${Math.floor(percentage)}% מהיעד הושג (₪${balance.toLocaleString()} / ₪${savingsGoal.toLocaleString()})`;
+        } else {
+            progressEl.style.width = '0%';
+            statusEl.innerText = 'הגדר יעד להתחלת מעקב';
+        }
+
         if (myChart) {
             myChart.data.datasets[0].data = [totals.income, totals.expense, totals.fixed];
             myChart.update();
@@ -276,10 +296,8 @@
     function importFromFile(event) {
         const reader = new FileReader();
         reader.onload = (e) => { 
-            try {
-                transactions = JSON.parse(e.target.result);
-                saveAndRefresh();
-            } catch(e) { alert("קובץ לא תקין"); }
+            transactions = JSON.parse(e.target.result); 
+            saveAndRefresh(); 
         };
         reader.readAsText(event.target.files[0]);
     }
