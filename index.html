@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול כספי הבית - עם יעד חיסכון</title>
+    <title>ניהול כספי הבית - גרסה מלאה</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -44,7 +44,7 @@
             margin-bottom: 15px;
         }
 
-        .card h3 { margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .card h3 { margin-top: 0; font-size: 1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
 
         .balance-box {
             background: var(--primary);
@@ -55,22 +55,28 @@
             margin-bottom: 15px;
         }
 
-        /* עיצוב יעד חיסכון */
-        .savings-goal-box { margin-bottom: 15px; }
+        /* התראת הוצאות קבועות */
+        .stat-badge {
+            display: block;
+            padding: 8px;
+            border-radius: 6px;
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
         .progress-container {
             background: #eee;
             border-radius: 10px;
-            height: 12px;
+            height: 8px;
             width: 100%;
-            margin: 10px 0;
+            margin: 8px 0;
             overflow: hidden;
         }
-        .progress-bar {
-            background: var(--savings-color);
-            height: 100%;
-            width: 0%;
-            transition: width 0.5s ease-in-out;
-        }
+        .progress-bar { height: 100%; width: 0%; transition: width 0.5s ease; }
+        .bg-savings { background: var(--savings-color); }
+        .bg-fixed { background: var(--fixed-color); }
 
         .input-stack { display: flex; flex-direction: column; gap: 8px; }
         
@@ -78,7 +84,7 @@
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         input.error { border-color: var(--error-color); background-color: #fff5f5; }
@@ -86,7 +92,7 @@
 
         .btn-add { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 5px; }
 
-        .transaction-list { max-height: 480px; overflow-y: auto; }
+        .transaction-list { max-height: 500px; overflow-y: auto; }
 
         .transaction-item {
             display: grid;
@@ -103,14 +109,15 @@
         .item-expense { border-right-color: var(--expense-color); }
         .item-fixed { border-right-color: var(--fixed-color); }
 
-        .amount-text { font-weight: bold; margin-right: 15px; min-width: 80px; text-align: left; }
-        .delete-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; }
+        .amount-text { font-weight: bold; margin-right: 10px; min-width: 75px; text-align: left; }
+        .delete-btn { background: none; border: none; color: #ddd; cursor: pointer; font-size: 16px; transition: color 0.2s; }
+        .delete-btn:hover { color: var(--expense-color); }
 
-        .chart-wrapper { width: 100%; height: 180px; }
+        .chart-wrapper { width: 100%; height: 160px; }
         .actions { display: flex; gap: 5px; margin-top: 10px; }
-        .btn-small { flex: 1; padding: 5px; font-size: 11px; background: #eee; cursor: pointer; border: 1px solid #ddd; }
+        .btn-small { flex: 1; padding: 4px; font-size: 10px; background: #eee; cursor: pointer; border: 1px solid #ddd; }
 
-        footer { text-align: center; margin-top: 30px; font-size: 0.75em; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
+        footer { text-align: center; margin-top: 30px; font-size: 11px; color: #999; border-top: 1px solid #ddd; padding: 15px; }
 
         @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
     </style>
@@ -123,22 +130,36 @@
     <div class="dashboard-grid">
         <aside>
             <div class="balance-box">
-                <div style="font-size: 0.9em; opacity: 0.8;">יתרה כוללת</div>
+                <div style="font-size: 0.85em; opacity: 0.9;">יתרה נוכחית</div>
                 <div id="total-balance" style="font-size: 1.4em; font-weight: bold;">₪ 0</div>
             </div>
 
-            <div class="card savings-goal-box">
-                <h3 style="font-size: 1rem;">יעד חיסכון</h3>
-                <input type="number" id="savings-goal-input" placeholder="הגדר יעד (₪)" onchange="updateSavingsGoal()" style="width: 80%; margin-bottom: 5px;">
-                <div class="progress-container">
-                    <div id="savings-progress" class="progress-bar"></div>
+            <div class="card">
+                <h3>יעדים וניתוח</h3>
+                
+                <div style="margin-bottom: 15px;">
+                    <div style="display:flex; justify-content: space-between; font-size: 12px;">
+                        <span>יעד חיסכון</span>
+                        <input type="number" id="savings-goal-input" placeholder="הגדר יעד" onchange="updateSavingsGoal()" style="width: 70px; padding: 2px;">
+                    </div>
+                    <div class="progress-container">
+                        <div id="savings-progress" class="progress-bar bg-savings"></div>
+                    </div>
+                    <div id="savings-status" style="font-size: 10px; color: #666;">0% מהיעד</div>
                 </div>
-                <div id="savings-status" style="font-size: 11px; color: #666;">0% מהיעד הושג</div>
+
+                <div class="stat-badge" id="fixed-analysis">
+                    <div>נטל הוצאות קבועות:</div>
+                    <div class="progress-container">
+                        <div id="fixed-progress" class="progress-bar bg-fixed"></div>
+                    </div>
+                    <div id="fixed-status" style="font-weight: bold; font-size: 11px;">0% מההכנסות</div>
+                </div>
             </div>
 
             <div class="card">
                 <h3>הוספה מהירה</h3>
-                <div id="error-msg">⚠️ נא למלא תיאור וסכום תקין</div>
+                <div id="error-msg">⚠️ חסרים פרטים</div>
                 <div class="input-stack">
                     <input type="text" id="desc" placeholder="תיאור">
                     <input type="number" id="amount" placeholder="סכום">
@@ -147,7 +168,7 @@
                         <option value="expense">הוצאה</option>
                         <option value="fixed">הוצאה קבועה</option>
                     </select>
-                    <button class="btn-add" onclick="addTransaction()">הוסף למערכת</button>
+                    <button class="btn-add" onclick="addTransaction()">הוסף</button>
                 </div>
                 <div class="actions">
                     <button class="btn-small" onclick="exportToFile()">ייצוא</button>
@@ -162,7 +183,7 @@
         </aside>
 
         <main>
-            <div class="card" style="min-height: 550px;">
+            <div class="card" style="min-height: 570px;">
                 <h3>פירוט תנועות</h3>
                 <div id="list" class="transaction-list"></div>
             </div>
@@ -188,49 +209,42 @@
                 datasets: [{
                     data: [0, 0, 0],
                     backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
-                    borderWidth: 2
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
-                cutout: '70%'
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 10 } } } },
+                cutout: '75%'
             }
         });
     }
 
     function updateSavingsGoal() {
-        const val = parseFloat(document.getElementById('savings-goal-input').value);
-        savingsGoal = isNaN(val) ? 0 : val;
+        savingsGoal = parseFloat(document.getElementById('savings-goal-input').value) || 0;
         localStorage.setItem('home_budget_goal', savingsGoal);
         updateUI();
     }
 
     function addTransaction() {
-        const descEl = document.getElementById('desc');
-        const amountEl = document.getElementById('amount');
-        const errorMsg = document.getElementById('error-msg');
+        const d = document.getElementById('desc');
+        const a = document.getElementById('amount');
+        const err = document.getElementById('error-msg');
         
-        const desc = descEl.value.trim();
-        const amount = parseFloat(amountEl.value);
-        const type = document.getElementById('type').value;
-
-        descEl.classList.remove('error');
-        amountEl.classList.remove('error');
-        errorMsg.style.display = 'none';
-
-        if (!desc || isNaN(amount) || amount <= 0) {
-            if (!desc) descEl.classList.add('error');
-            if (isNaN(amount) || amount <= 0) amountEl.classList.add('error');
-            errorMsg.style.display = 'block';
+        if (!d.value.trim() || isNaN(parseFloat(a.value)) || parseFloat(a.value) <= 0) {
+            err.style.display = 'block';
+            d.classList.toggle('error', !d.value.trim());
+            a.classList.toggle('error', isNaN(parseFloat(a.value)));
             return;
         }
 
-        transactions.push({ id: Date.now(), desc, amount, type });
+        err.style.display = 'none';
+        d.classList.remove('error'); a.classList.remove('error');
+
+        transactions.push({ id: Date.now(), desc: d.value.trim(), amount: parseFloat(a.value), type: document.getElementById('type').value });
         saveAndRefresh();
-        descEl.value = '';
-        amountEl.value = '';
+        d.value = ''; a.value = '';
     }
 
     function deleteTransaction(id) {
@@ -252,10 +266,9 @@
             totals[t.type] += t.amount;
             const li = document.createElement('div');
             li.className = `transaction-item item-${t.type}`;
-            const sign = t.type === 'income' ? '+' : '-';
             li.innerHTML = `
                 <span>${t.desc}</span>
-                <span class="amount-text" dir="ltr">${sign} ₪${t.amount.toLocaleString()}</span>
+                <span class="amount-text" dir="ltr">${t.type === 'income' ? '+' : '-'} ₪${t.amount.toLocaleString()}</span>
                 <button class="delete-btn" onclick="deleteTransaction(${t.id})">🗑</button>
             `;
             list.appendChild(li);
@@ -266,17 +279,18 @@
 
         // עדכון יעד חיסכון
         document.getElementById('savings-goal-input').value = savingsGoal || '';
-        const progressEl = document.getElementById('savings-progress');
-        const statusEl = document.getElementById('savings-status');
-        
         if (savingsGoal > 0) {
-            let percentage = (balance / savingsGoal) * 100;
-            percentage = Math.min(Math.max(percentage, 0), 100); // הגבלה בין 0 ל-100
-            progressEl.style.width = percentage + '%';
-            statusEl.innerText = `${Math.floor(percentage)}% מהיעד הושג (₪${balance.toLocaleString()} / ₪${savingsGoal.toLocaleString()})`;
-        } else {
-            progressEl.style.width = '0%';
-            statusEl.innerText = 'הגדר יעד להתחלת מעקב';
+            const perc = Math.min(Math.max((balance / savingsGoal) * 100, 0), 100);
+            document.getElementById('savings-progress').style.width = perc + '%';
+            document.getElementById('savings-status').innerText = `${Math.floor(perc)}% הושג`;
+        }
+
+        // עדכון ניתוח הוצאות קבועות
+        if (totals.income > 0) {
+            const fixedPerc = Math.min((totals.fixed / totals.income) * 100, 100);
+            document.getElementById('fixed-progress').style.width = fixedPerc + '%';
+            document.getElementById('fixed-status').innerText = `${Math.floor(fixedPerc)}% מההכנסה`;
+            document.getElementById('fixed-status').style.color = fixedPerc > 50 ? 'var(--expense-color)' : 'var(--text-main)';
         }
 
         if (myChart) {
@@ -286,24 +300,18 @@
     }
 
     function exportToFile() {
-        const blob = new Blob([JSON.stringify(transactions)], { type: "application/json" });
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = "budget_data.json";
-        a.click();
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(transactions)]));
+        a.download = "budget.json"; a.click();
     }
 
-    function importFromFile(event) {
-        const reader = new FileReader();
-        reader.onload = (e) => { 
-            transactions = JSON.parse(e.target.result); 
-            saveAndRefresh(); 
-        };
-        reader.readAsText(event.target.files[0]);
+    function importFromFile(e) {
+        const r = new FileReader();
+        r.onload = (ev) => { transactions = JSON.parse(ev.target.result); saveAndRefresh(); };
+        r.readAsText(e.target.files[0]);
     }
 
-    initChart();
-    updateUI();
+    initChart(); updateUI();
 </script>
 
 </body>
