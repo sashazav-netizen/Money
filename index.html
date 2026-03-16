@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול כספי הבית - קומפקטי עם אימות</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --primary: #34495e;
+            --income-color: #27ae60;
+            --expense-color: #e74c3c;
+            --fixed-color: #f39c12;
+            --text-main: #2c3e50;
+            --error-color: #d63031;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 10px;
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
+        .main-container { max-width: 1000px; margin: 0 auto; }
+        h1 { font-size: 1.5rem; text-align: center; margin: 10px 0; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        .card h3 { margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+
+        .balance-box {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .input-stack { display: flex; flex-direction: column; gap: 8px; }
+        
+        input, select, button {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        /* עיצוב שגיאה לשדות */
+        input.error { border-color: var(--error-color); background-color: #fff5f5; }
+
+        #error-msg {
+            color: var(--error-color);
+            font-size: 12px;
+            font-weight: bold;
+            display: none; /* מוסתר כברירת מחדל */
+            margin-bottom: 5px;
+        }
+
+        .btn-add { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        .btn-add:active { transform: scale(0.98); }
+
+        .transaction-list { max-height: 480px; overflow-y: auto; }
+
+        .transaction-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            padding: 6px 10px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            background: #fff;
+            border-right: 4px solid #ccc;
+            font-size: 13.5px;
+        }
+
+        .item-income { border-right-color: var(--income-color); }
+        .item-expense { border-right-color: var(--expense-color); }
+        .item-fixed { border-right-color: var(--fixed-color); }
+
+        .amount-text { font-weight: bold; margin-right: 15px; min-width: 80px; text-align: left; }
+        .delete-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; }
+        .delete-btn:hover { color: var(--expense-color); }
+
+        .chart-wrapper { width: 100%; max-width: 220px; margin: 0 auto; height: 180px; }
+        .actions { display: flex; gap: 5px; margin-top: 10px; }
+        .btn-small { flex: 1; padding: 5px; font-size: 11px; background: #eee; cursor: pointer; border: 1px solid #ddd; }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.75em;
+            color: #999;
+        }
+
+        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <h1>ניהול כספי הבית</h1>
+
+    <div class="dashboard-grid">
+        <aside>
+            <div class="balance-box">
+                <div style="font-size: 0.9em; opacity: 0.8;">יתרה כוללת</div>
+                <div id="total-balance" style="font-size: 1.4em; font-weight: bold;">₪ 0</div>
+            </div>
+
+            <div class="card">
+                <h3>הוספה מהירה</h3>
+                <div id="error-msg">⚠️ נא למלא תיאור וסכום תקין</div>
+                <div class="input-stack">
+                    <input type="text" id="desc" placeholder="תיאור (למשל: סופר)">
+                    <input type="number" id="amount" placeholder="סכום">
+                    <select id="type">
+                        <option value="income">הכנסה</option>
+                        <option value="expense">הוצאה</option>
+                        <option value="fixed">הוצאה קבועה</option>
+                    </select>
+                    <button class="btn-add" onclick="addTransaction()">הוסף למערכת</button>
+                </div>
+                <div class="actions">
+                    <button class="btn-small" onclick="exportToFile()">ייצוא</button>
+                    <button class="btn-small" onclick="document.getElementById('fileInput').click()">ייבוא</button>
+                    <input type="file" id="fileInput" style="display:none" onchange="importFromFile(event)">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="chart-wrapper">
+                    <canvas id="budgetChart"></canvas>
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="card" style="min-height: 520px;">
+                <h3>פירוט תנועות</h3>
+                <div id="list" class="transaction-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        &copy; 2026 כל הזכויות שמורות - אלכסנדר זבודיסקר
+    </footer>
+</div>
+
+<script>
+    let transactions = JSON.parse(localStorage.getItem('home_budget_data')) || [];
+    let myChart = null;
+
+    function initChart() {
+        const ctx = document.getElementById('budgetChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['הכנסות', 'הוצאות', 'קבועות'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } },
+                cutout: '70%'
+            }
+        });
+    }
+
+    function addTransaction() {
+        const descEl = document.getElementById('desc');
+        const amountEl = document.getElementById('amount');
+        const errorMsg = document.getElementById('error-msg');
+        
+        const desc = descEl.value.trim();
+        const amount = parseFloat(amountEl.value);
+        const type = document.getElementById('type').value;
+
+        // איפוס שגיאות קודמות
+        descEl.classList.remove('error');
+        amountEl.classList.remove('error');
+        errorMsg.style.display = 'none';
+
+        // בדיקת תקינות
+        let hasError = false;
+        if (!desc) {
+            descEl.classList.add('error');
+            hasError = true;
+        }
+        if (isNaN(amount) || amount <= 0) {
+            amountEl.classList.add('error');
+            hasError = true;
+        }
+
+        if (hasError) {
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        transactions.push({ id: Date.now(), desc, amount, type });
+        saveAndRefresh();
+        
+        descEl.value = '';
+        amountEl.value = '';
+    }
+
+    function deleteTransaction(id) {
+        transactions = transactions.filter(t => t.id !== id);
+        saveAndRefresh();
+    }
+
+    function saveAndRefresh() {
+        localStorage.setItem('home_budget_data', JSON.stringify(transactions));
+        updateUI();
+    }
+
+    function updateUI() {
+        const list = document.getElementById('list');
+        list.innerHTML = '';
+        let totals = { income: 0, expense: 0, fixed: 0 };
+
+        transactions.slice().reverse().forEach(t => {
+            totals[t.type] += t.amount;
+            const li = document.createElement('div');
+            li.className = `transaction-item item-${t.type}`;
+            const sign = t.type === 'income' ? '+' : '-';
+            li.innerHTML = `
+                <span>${t.desc}</span>
+                <span class="amount-text" dir="ltr">${sign} ₪${t.amount.toLocaleString()}</span>
+                <button class="delete-btn" onclick="deleteTransaction(${t.id})">🗑</button>
+            `;
+            list.appendChild(li);
+        });
+
+        const balance = totals.income - (totals.expense + totals.fixed);
+        document.getElementById('total-balance').innerText = `₪ ${balance.toLocaleString()}`;
+
+        if (myChart) {
+            myChart.data.datasets[0].data = [totals.income, totals.expense, totals.fixed];
+            myChart.update();
+        }
+    }
+
+    function exportToFile() {
+        const blob = new Blob([JSON.stringify(transactions)], { type: "application/json" });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "budget_data.json";
+        a.click();
+    }
+
+    function importFromFile(event) {
+        const reader = new FileReader();
+        reader.onload = (e) => { 
+            try {
+                transactions = JSON.parse(e.target.result);
+                saveAndRefresh();
+            } catch(e) { alert("קובץ לא תקין"); }
+        };
+        reader.readAsText(event.target.files[0]);
+    }
+
+    initChart();
+    updateUI();
+</script>
+
+</body>
+</html>
