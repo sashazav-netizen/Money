@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול כספי הבית - גרסה נקייה</title>
+    <title>ניהול כספי הבית</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* הגדרות צבעים ומשתנים */
         :root {
             --bg-color: #f0f2f5;
             --card-bg: #ffffff;
@@ -14,12 +13,11 @@
             --income: #27ae60;
             --expense: #e74c3c;
             --fixed: #f39c12;
-            --savings: #3498db;
             --border-color: #ddd;
         }
 
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
             background-color: var(--bg-color); 
             margin: 0; padding: 10px; color: #333; 
             height: 100vh; overflow: hidden; display: flex; flex-direction: column;
@@ -27,12 +25,10 @@
 
         .container { max-width: 1100px; margin: 0 auto; width: 100%; height: 100%; display: flex; flex-direction: column; }
 
-        /* כותרת */
         header { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 10px 0; }
         .header-icon { width: 35px; height: 35px; }
         h1 { margin: 0; font-size: 1.6rem; color: var(--primary); }
 
-        /* ניווט חודשים */
         .month-nav {
             display: flex; justify-content: center; align-items: center; gap: 20px;
             background: var(--primary); color: white; padding: 8px; border-radius: 8px; margin-bottom: 10px;
@@ -40,22 +36,18 @@
         .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; padding: 5px 15px; border-radius: 4px; font-weight: bold; }
         .nav-btn:hover { background: rgba(255,255,255,0.3); }
 
-        /* פריסה */
         .grid { display: grid; grid-template-columns: 300px 1fr; gap: 15px; flex-grow: 1; overflow: hidden; }
         .card { background: var(--card-bg); padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 10px; }
         .card h3 { margin: 0 0 12px 0; font-size: 1rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
 
-        /* אלמנטים של מידע */
-        .balance-display { border: 2px solid var(--primary); text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .balance-display { border: 2px solid var(--primary); text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 15px; background: white; }
         .balance-val { font-size: 1.5rem; font-weight: bold; color: var(--primary); display: block; }
 
-        /* טופס */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .full-width { grid-column: span 2; }
         input, select, button { padding: 8px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 13px; }
         .btn-submit { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; }
 
-        /* רשימת תנועות */
         .list-section { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
         .scroll-area { flex-grow: 1; overflow-y: auto; padding-left: 5px; }
         .item { 
@@ -67,10 +59,9 @@
         .expense { border-right-color: var(--expense); }
         .fixed { border-right-color: var(--fixed); }
 
-        /* מדים וגרפים */
-        .progress-bg { background: #eee; border-radius: 10px; height: 6px; margin: 5px 0 10px 0; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; transition: width 0.4s ease; }
-        .chart-box { height: 140px; }
+        .progress-bg { background: #eee; border-radius: 10px; height: 8px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.4s ease; background: var(--fixed); }
+        .chart-box { height: 160px; margin-top: 10px; }
 
         footer { text-align: center; font-size: 11px; color: #888; padding: 10px; }
 
@@ -100,7 +91,7 @@
             </div>
 
             <div class="card">
-                <h3>הוספה</h3>
+                <h3>הוספת תנועה</h3>
                 <div class="form-grid">
                     <input type="text" id="desc" placeholder="תיאור" class="full-width">
                     <input type="number" id="amt" placeholder="סכום">
@@ -109,25 +100,20 @@
                         <option value="expense">הוצאה</option>
                         <option value="fixed">קבועה</option>
                     </select>
-                    <button class="btn-submit full-width" onclick="addItem()">הוסף תנועה</button>
+                    <button class="btn-submit full-width" onclick="addItem()">הוסף למערכת</button>
                 </div>
             </div>
 
             <div class="card">
-                <h3>יעדים</h3>
-                <div style="font-size: 11px;">
-                    יעד חיסכון: <input type="number" id="goalInput" onchange="setGoal()" style="width: 50px;">
-                    <div class="progress-bg"><div id="saveProgress" class="progress-fill" style="background:var(--savings)"></div></div>
-                    נטל קבוע: <span id="fixedText" style="font-weight:bold">0%</span>
-                    <div class="progress-bg"><div id="fixedProgress" class="progress-fill" style="background:var(--fixed)"></div></div>
+                <h3>ניתוח נטל קבוע</h3>
+                <div style="font-size: 12px;">
+                    אחוז מההכנסה: <span id="fixedText" style="font-weight:bold">0%</span>
+                    <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
                 </div>
-            </div>
-
-            <div class="card">
                 <div class="chart-box"><canvas id="mainChart"></canvas></div>
-                <div style="display:flex; gap:5px; margin-top:10px;">
-                    <button onclick="exportData()" class="nav-btn" style="flex:1; font-size:10px; background:#95a5a6">ייצוא</button>
-                    <button onclick="document.getElementById('fileIn').click()" class="nav-btn" style="flex:1; font-size:10px; background:#95a5a6">ייבוא</button>
+                <div style="display:flex; gap:5px; margin-top:15px;">
+                    <button onclick="exportData()" style="flex:1; font-size:10px; cursor:pointer; padding:5px; border:1px solid #ccc; background:#f9f9f9;">ייצוא</button>
+                    <button onclick="document.getElementById('fileIn').click()" style="flex:1; font-size:10px; cursor:pointer; padding:5px; border:1px solid #ccc; background:#f9f9f9;">ייבוא</button>
                     <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
                 </div>
             </div>
@@ -135,7 +121,7 @@
 
         <main class="list-section">
             <div class="card" style="height: 100%; display: flex; flex-direction: column;">
-                <h3>תנועות לחודש <span id="labelMonth"></span></h3>
+                <h3>פירוט תנועות - <span id="labelMonth"></span></h3>
                 <div id="list" class="scroll-area"></div>
             </div>
         </main>
@@ -145,44 +131,36 @@
 </div>
 
 <script>
-    // משתנים גלובליים
     let data = JSON.parse(localStorage.getItem('budget_db')) || [];
-    let goal = parseFloat(localStorage.getItem('budget_goal')) || 0;
     let viewDate = new Date();
     let chart;
 
-    // אתחול הגרף
     function initChart() {
         chart = new Chart(document.getElementById('mainChart'), {
             type: 'doughnut',
             data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#27ae60','#e74c3c','#f39c12'], borderWidth: 1 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 8, font: { size: 10 } } } }, cutout: '75%' }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }, cutout: '70%' }
         });
     }
 
-    // הוספת תנועה
     function addItem() {
         const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
         if(!d.value || !a.value) return;
-
         data.push({ id: Date.now(), desc: d.value, amt: parseFloat(a.value), type: t.value, date: viewDate.toISOString() });
         save();
         d.value = ''; a.value = '';
     }
 
     function deleteItem(id) { data = data.filter(i => i.id !== id); save(); }
-    function setGoal() { goal = parseFloat(document.getElementById('goalInput').value) || 0; localStorage.setItem('budget_goal', goal); render(); }
     function moveMonth(n) { viewDate.setMonth(viewDate.getMonth() + n); render(); }
     function save() { localStorage.setItem('budget_db', JSON.stringify(data)); render(); }
 
-    // עדכון הממשק
     function render() {
         const months = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
         const m = viewDate.getMonth(), y = viewDate.getFullYear();
         
         document.getElementById('monthTitle').innerText = `${months[m]} ${y}`;
         document.getElementById('labelMonth').innerText = months[m];
-        document.getElementById('goalInput').value = goal || '';
 
         const currentData = data.filter(i => { const d = new Date(i.date); return d.getMonth() === m && d.getFullYear() === y; });
         const list = document.getElementById('list');
@@ -203,20 +181,18 @@
         });
 
         const bal = totals.income - (totals.expense + totals.fixed);
-        document.getElementById('balanceVal').innerText = `₪ ${bal.toLocaleString()}`;
+        const balEl = document.getElementById('balanceVal');
+        balEl.innerText = `₪ ${bal.toLocaleString()}`;
+        balEl.style.color = bal < 0 ? 'var(--expense)' : 'var(--primary)';
         
-        // עדכון גרף
         chart.data.datasets[0].data = [totals.income, totals.expense, totals.fixed];
         chart.update();
 
-        // עדכון פסים
-        document.getElementById('saveProgress').style.width = goal > 0 ? Math.min(Math.max((bal/goal)*100, 0), 100) + '%' : '0%';
         const fixP = totals.income > 0 ? Math.floor((totals.fixed/totals.income)*100) : 0;
         document.getElementById('fixedText').innerText = fixP + '%';
         document.getElementById('fixedProgress').style.width = Math.min(fixP, 100) + '%';
     }
 
-    // ייצוא וייבוא
     function exportData() {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(new Blob([JSON.stringify(data)]));
