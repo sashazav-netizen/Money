@@ -19,62 +19,75 @@
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg-color);
-            margin: 0; padding: 10px; color: #333;
+            margin: 0; padding: 0; color: #333;
             display: flex; flex-direction: column; min-height: 100vh;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
-
-        header { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 10px 0; }
-        .header-icon { width: 35px; height: 35px; transition: transform 0.2s; }
-        .header-icon:hover { transform: scale(1.1); }
-        h1 { margin: 0; font-size: 1.6rem; color: var(--primary); }
-
-        .month-nav {
-            display: flex; justify-content: center; align-items: center; gap: 20px;
-            background: var(--primary); color: white; padding: 8px; border-radius: 8px; margin-bottom: 10px;
+        /* מסך כניסה */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary); display: flex; justify-content: center; align-items: center;
+            z-index: 9999; color: white;
         }
-        .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; padding: 5px 15px; border-radius: 4px; font-weight: bold; }
-        .nav-btn:hover { background: rgba(255,255,255,0.4); }
 
+        .login-card {
+            background: white; padding: 30px; border-radius: 15px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: #333; width: 300px;
+        }
+
+        .login-card img { width: 80px; margin-bottom: 20px; }
+        .login-card h2 { margin-bottom: 20px; font-size: 1.4rem; color: var(--primary); }
+        .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-size: 18px; box-sizing: border-box; }
+        .login-card button { width: 100%; padding: 12px; background: var(--income); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .login-card button:hover { opacity: 0.9; }
+        #error-msg { color: var(--expense); font-size: 14px; margin-top: 10px; display: none; }
+
+        /* תוכן האפליקציה - מוסתר בהתחלה */
+        #app-content { display: none; padding: 10px; }
+
+        /* עיצוב האפליקציה (כמו בגרסה הקודמת) */
+        .container { max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
+        header { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 10px 0; }
+        .header-icon { width: 35px; height: 35px; }
+        h1 { margin: 0; font-size: 1.6rem; color: var(--primary); }
+        .month-nav { display: flex; justify-content: center; align-items: center; gap: 20px; background: var(--primary); color: white; padding: 8px; border-radius: 8px; margin-bottom: 10px; }
+        .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; padding: 5px 15px; border-radius: 4px; font-weight: bold; }
         .grid { display: grid; grid-template-columns: 320px 1fr; gap: 15px; flex-grow: 1; }
         .card { background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 10px; }
         .card h3 { margin: 0 0 12px 0; font-size: 1rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-
         .balance-display { border: 2px solid var(--primary); text-align: center; padding: 10px; border-radius: 12px; margin-bottom: 15px; background: white; }
         .balance-val { font-size: 1.4rem; font-weight: bold; display: block; }
         .carry-over { font-size: 0.9rem; color: #666; margin-top: 5px; border-top: 1px dashed #eee; padding-top: 5px; }
-
-        .summary { display:flex; justify-content: space-between; margin-bottom:10px; font-size: 13px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .summary div span { font-weight:bold; }
-
+        .summary { display:flex; justify-content: space-between; margin-bottom:10px; font-size: 13px; background: #fff; padding: 10px; border-radius: 8px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .full-width { grid-column: span 2; }
         input, select, button { padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; }
-
         .btn-submit { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; }
-        .btn-submit:hover { background: #1f2d3d; }
-
-        .scroll-area { flex-grow: 1; overflow-y: auto; max-height: 400px; padding-left: 5px; }
-
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; background: #fefefe; border-radius: 8px; border-right: 5px solid #ccc; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .scroll-area { flex-grow: 1; overflow-y: auto; max-height: 400px; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; background: #fefefe; border-radius: 8px; border-right: 5px solid #ccc; font-size: 13px; }
         .income { border-right-color: var(--income); }
         .expense { border-right-color: var(--expense); }
         .fixed { border-right-color: var(--fixed); }
-
         .progress-bg { background: #eee; border-radius: 10px; height: 8px; margin: 10px 0; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; transition: width 0.6s ease; background: var(--fixed); }
-
         .chart-box { position: relative; width: 100%; }
-
         footer { text-align: center; font-size: 11px; color: #888; padding: 20px 10px; }
-
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .summary { flex-direction: column; gap:5px; } }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .summary { flex-direction: column; } }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div id="login-screen">
+    <div class="login-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png" alt="Lock Icon">
+        <h2>כניסה למערכת</h2>
+        <input type="password" id="pass-input" placeholder="הקש סיסמה" autofocus>
+        <button onclick="checkLogin()">התחברות</button>
+        <p id="error-msg">סיסמה שגויה, נסה שוב</p>
+    </div>
+</div>
+
+<div id="app-content" class="container">
     <header>
         <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" class="header-icon">
         <h1>ניהול כספי הבית</h1>
@@ -149,20 +162,40 @@
 </div>
 
 <script>
+// --- פונקציית כניסה ---
+function checkLogin() {
+    const passInput = document.getElementById("pass-input").value;
+    if (passInput === "0000") {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-content").style.display = "block";
+        initCharts();
+        render();
+    } else {
+        document.getElementById("error-msg").style.display = "block";
+        document.getElementById("pass-input").value = "";
+    }
+}
+
+// תמיכה בלחיצה על Enter במקלדת לכניסה
+document.getElementById("pass-input").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        checkLogin();
+    }
+});
+
+// --- לוגיקה של האפליקציה ---
 let data = JSON.parse(localStorage.getItem('budget_db')) || [];
 let viewDate = new Date();
 let mainChart, monthlyChart;
 let editingId = null;
 
 function initCharts() {
-    // גרף העוגה
     mainChart = new Chart(document.getElementById('mainChart'), {
         type: 'doughnut',
         data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#27ae60','#e74c3c','#f39c12'], borderWidth: 1 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }, cutout: '70%' }
     });
 
-    // גרף העמודות השנתי - כאן הוספתי את ה-Stacked
     monthlyChart = new Chart(document.getElementById('monthlyChart'), {
         type: 'bar',
         data: { labels: [], datasets: [
@@ -171,13 +204,9 @@ function initCharts() {
             { label:'קבועה', backgroundColor:'#f39c12', data:[] }
         ]},
         options: { 
-            responsive:true, 
-            maintainAspectRatio: false, 
+            responsive:true, maintainAspectRatio: false, 
             plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{size:10} } } }, 
-            scales:{ 
-                y:{ beginAtZero:true, stacked: true }, // עמודות נערמות
-                x:{ stacked: true } 
-            } 
+            scales:{ y:{ beginAtZero:true, stacked: true }, x:{ stacked: true } } 
         }
     });
 }
@@ -238,25 +267,17 @@ function render(){
     list.innerHTML='';
     
     let totals={income:0,expense:0,fixed:0};
-    
     currentData.slice().sort((a,b)=>b.id-a.id).forEach(i=>{
         totals[i.type]+=i.amt;
         const itemDiv = document.createElement('div');
         itemDiv.className = `item ${i.type}`;
-        itemDiv.innerHTML = `
-            <span>${i.desc}</span>
-            <div style="display:flex;align-items:center;gap:10px;">
-                <span dir="ltr" style="font-weight:bold">${i.type==='income'?'+':'-'} ₪${i.amt.toLocaleString()}</span>
-                <button onclick="editItem(${i.id})" style="border:none;background:none;cursor:pointer;font-size:14px;">✏️</button>
-                <button onclick="deleteItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#ddd;">🗑</button>
-            </div>`;
+        itemDiv.innerHTML = `<span>${i.desc}</span><div style="display:flex;align-items:center;gap:10px;"><span dir="ltr" style="font-weight:bold">${i.type==='income'?'+':'-'} ₪${i.amt.toLocaleString()}</span><button onclick="editItem(${i.id})" style="border:none;background:none;cursor:pointer;">✏️</button><button onclick="deleteItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#ddd;">🗑</button></div>`;
         list.appendChild(itemDiv);
     });
 
     const currentBal = totals.income-(totals.expense+totals.fixed);
-    const balEl = document.getElementById('balanceVal');
-    balEl.innerText=`₪ ${currentBal.toLocaleString()}`;
-    balEl.style.color=currentBal < 0 ? 'var(--expense)' : 'var(--income)';
+    document.getElementById('balanceVal').innerText=`₪ ${currentBal.toLocaleString()}`;
+    document.getElementById('balanceVal').style.color=currentBal < 0 ? 'var(--expense)' : 'var(--income)';
 
     const accumulatedBal = data.reduce((acc,i)=>{
         const d=new Date(i.date);
@@ -264,22 +285,18 @@ function render(){
         const viewMonth=m+(y*12);
         return (itemMonth <= viewMonth) ? (i.type==='income'?acc+i.amt:acc-i.amt) : acc;
     },0);
-    
-    const totalAccEl=document.getElementById('totalAccumulated');
-    totalAccEl.innerText=`₪ ${accumulatedBal.toLocaleString()}`;
-    totalAccEl.style.color=accumulatedBal<0?'var(--expense)':'var(--income)';
+    document.getElementById('totalAccumulated').innerText=`₪ ${accumulatedBal.toLocaleString()}`;
+    document.getElementById('totalAccumulated').style.color=accumulatedBal<0?'var(--expense)':'var(--income)';
 
     document.getElementById('totalIncome').innerText=`₪${totals.income.toLocaleString()}`;
     document.getElementById('totalExpense').innerText=`₪${(totals.expense+totals.fixed).toLocaleString()}`;
     document.getElementById('netBalance').innerText=`₪${currentBal.toLocaleString()}`;
 
     if(mainChart){ mainChart.data.datasets[0].data=[totals.income,totals.expense,totals.fixed]; mainChart.update(); }
-
     const fixP = totals.income > 0 ? Math.floor((totals.fixed/totals.income)*100) : 0;
     document.getElementById('fixedText').innerText=fixP+'%';
     document.getElementById('fixedProgress').style.width=Math.min(fixP,100)+'%';
 
-    // עדכון גרף שנתי
     const monthLabels=[]; const incomeData=[]; const expenseData=[]; const fixedData=[];
     for(let i=0; i<12; i++){
         monthLabels.push(months[i]);
@@ -302,14 +319,11 @@ function exportData(){
     a.href=URL.createObjectURL(new Blob([JSON.stringify(data)], {type:"application/json"}));
     a.download="budget_backup.json"; a.click();
 }
-
 function importData(e){
     const r=new FileReader();
     r.onload=(ev)=>{ try{ data=JSON.parse(ev.target.result); save(); } catch(e){ alert('קובץ לא תקין'); } };
     r.readAsText(e.target.files[0]);
 }
-
-window.onload = () => { initCharts(); render(); };
 </script>
 
 </body>
