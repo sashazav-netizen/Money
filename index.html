@@ -2,211 +2,274 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול כספי הבית - אלכסנדר</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ניהול כספי הבית - Premium Dark</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #f9fafc;
-            --card-bg: #ffffff;
-            --primary: #2c3e50;
-            --income: #27ae60;
-            --expense: #e74c3c;
-            --fixed: #f39c12;
-            --border-color: #ddd;
+            --primary-bg: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --income: #22c55e;
+            --expense: #ef4444;
+            --fixed: #f59e0b;
+            --accent: #38bdf8;
         }
 
-        body {
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        html, body { 
+            max-width: 100%;
+            overflow-x: hidden;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: var(--text-main);
             font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0; padding: 0; color: #333;
-            display: flex; flex-direction: column; min-height: 100vh;
+            min-height: 100vh;
         }
+
+        /* --- הודעת שגיאה מודרנית (Toast) --- */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 10000;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
 
         /* מסך כניסה */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--primary); display: flex; justify-content: center; align-items: center;
-            z-index: 9999; color: white;
+            background: var(--primary-bg); display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
         }
 
         .login-card {
-            background: white; padding: 30px; border-radius: 15px; text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: #333; width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 40px; border-radius: 24px; text-align: center;
+            border: 1px solid var(--glass-border);
+            width: 85%; max-width: 340px;
         }
 
-        .login-card img { width: 80px; margin-bottom: 20px; }
-        .login-card h2 { margin-bottom: 20px; font-size: 1.4rem; color: var(--primary); }
-        .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-size: 18px; box-sizing: border-box; }
-        .login-card button { width: 100%; padding: 12px; background: var(--income); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
-        .login-card button:hover { opacity: 0.9; }
-        #error-msg { color: var(--expense); font-size: 14px; margin-top: 10px; display: none; }
+        .login-card img { width: 70px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent)); }
+        .login-card input { 
+            width: 100%; padding: 15px; margin-bottom: 15px; 
+            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
+            border-radius: 12px; color: white; text-align: center; font-size: 20px; outline: none;
+        }
+        .login-card button { 
+            width: 100%; padding: 15px; background: var(--accent); color: var(--primary-bg); 
+            border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 18px;
+        }
 
-        /* תוכן האפליקציה - מוסתר בהתחלה */
-        #app-content { display: none; padding: 10px; }
+        /* תוכן האפליקציה */
+        #app-content { display: none; padding: 15px; width: 100%; }
+        .container { max-width: 1100px; margin: 0 auto; width: 100%; }
 
-        /* עיצוב האפליקציה (כמו בגרסה הקודמת) */
-        .container { max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
-        header { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 10px 0; }
-        .header-icon { width: 35px; height: 35px; }
-        h1 { margin: 0; font-size: 1.6rem; color: var(--primary); }
-        .month-nav { display: flex; justify-content: center; align-items: center; gap: 20px; background: var(--primary); color: white; padding: 8px; border-radius: 8px; margin-bottom: 10px; }
-        .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; cursor: pointer; padding: 5px 15px; border-radius: 4px; font-weight: bold; }
-        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 15px; flex-grow: 1; }
-        .card { background: var(--card-bg); padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 10px; }
-        .card h3 { margin: 0 0 12px 0; font-size: 1rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .balance-display { border: 2px solid var(--primary); text-align: center; padding: 10px; border-radius: 12px; margin-bottom: 15px; background: white; }
-        .balance-val { font-size: 1.4rem; font-weight: bold; display: block; }
-        .carry-over { font-size: 0.9rem; color: #666; margin-top: 5px; border-top: 1px dashed #eee; padding-top: 5px; }
-        .summary { display:flex; justify-content: space-between; margin-bottom:10px; font-size: 13px; background: #fff; padding: 10px; border-radius: 8px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        header { text-align: center; padding: 10px 0 25px 0; }
+        h1 { font-size: 1.6rem; font-weight: 600; background: linear-gradient(to left, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .month-nav {
+            display: flex; justify-content: center; align-items: center; gap: 20px;
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border); margin-bottom: 20px;
+        }
+        .nav-btn { background: none; border: 1px solid var(--glass-border); color: white; cursor: pointer; padding: 5px 15px; border-radius: 8px; font-size: 18px; }
+
+        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; width: 100%; }
+
+        .card { 
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border);
+            margin-bottom: 20px; width: 100%;
+        }
+        .card h3 { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px; text-transform: uppercase; }
+
+        .balance-display { text-align: center; padding: 20px; }
+        .balance-val { font-size: 2rem; font-weight: 700; margin: 5px 0; }
+        .carry-over { color: var(--text-dim); font-size: 0.85rem; padding-top: 10px; border-top: 1px solid var(--glass-border); }
+
+        .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .summary-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--glass-border); }
+        .summary-item span { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
+        .summary-item b { font-size: 0.95rem; }
+        .net-card { grid-column: span 2; background: rgba(255,255,255,0.03); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .full-width { grid-column: span 2; }
-        input, select, button { padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; }
-        .btn-submit { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; }
-        .scroll-area { flex-grow: 1; overflow-y: auto; max-height: 400px; }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; background: #fefefe; border-radius: 8px; border-right: 5px solid #ccc; font-size: 13px; }
+        input, select { 
+            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); 
+            color: white; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; width: 100%;
+        }
+        .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; border: none; cursor: pointer; padding: 12px; border-radius: 10px; font-size: 15px; }
+
+        .scroll-area { max-height: 400px; overflow-y: auto; padding-right: 5px; }
+        .item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.03);
+            border-radius: 14px; border-right: 4px solid #444; width: 100%;
+        }
         .income { border-right-color: var(--income); }
         .expense { border-right-color: var(--expense); }
         .fixed { border-right-color: var(--fixed); }
-        .progress-bg { background: #eee; border-radius: 10px; height: 8px; margin: 10px 0; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; transition: width 0.6s ease; background: var(--fixed); }
-        .chart-box { position: relative; width: 100%; }
-        footer { text-align: center; font-size: 11px; color: #888; padding: 20px 10px; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .summary { flex-direction: column; } }
+
+        .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 8px; margin: 10px 0; width: 100%; }
+        .progress-fill { height: 100%; border-radius: 20px; background: var(--fixed); box-shadow: 0 0 10px var(--fixed); transition: width 0.5s; }
+
+        footer { text-align: center; color: var(--text-dim); font-size: 11px; padding: 40px; }
+
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
+<div id="toast">⚠️ <span></span></div>
+
 <div id="login-screen">
     <div class="login-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png" alt="Lock Icon">
+        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png">
         <h2>כניסה למערכת</h2>
-        <input type="password" id="pass-input" placeholder="הקש סיסמה" autofocus>
-        <button onclick="checkLogin()">התחברות</button>
-        <p id="error-msg">סיסמה שגויה, נסה שוב</p>
+        <input type="password" id="pass-input" placeholder="סיסמה">
+        <button onclick="checkLogin()">פתיחה</button>
+        <p id="error-msg" style="color:var(--expense); display:none; margin-top:10px; font-size: 14px;">סיסמה שגויה, נסה שוב</p>
     </div>
 </div>
 
-<div id="app-content" class="container">
-    <header>
-        <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" class="header-icon">
-        <h1>ניהול כספי הבית</h1>
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135706.png" class="header-icon">
-    </header>
+<div id="app-content">
+    <div class="container">
+        <header>
+            <h1>ניהול כספי הבית</h1>
+        </header>
 
-    <div class="month-nav">
-        <button class="nav-btn" onclick="moveMonth(-1)">◀</button>
-        <span id="monthTitle" style="font-weight: bold; min-width: 120px; text-align: center;"></span>
-        <button class="nav-btn" onclick="moveMonth(1)">▶</button>
-    </div>
+        <div class="month-nav">
+            <button class="nav-btn" onclick="moveMonth(-1)">◀</button>
+            <span id="monthTitle" style="font-weight: 600; font-size: 1.1rem; min-width: 120px; text-align: center;"></span>
+            <button class="nav-btn" onclick="moveMonth(1)">▶</button>
+        </div>
 
-    <div class="grid">
-        <aside>
-            <div class="balance-display">
-                <span style="font-size: 0.8rem; color: #666;">יתרת חודש נוכחי</span>
-                <span id="balanceVal" class="balance-val">₪ 0</span>
-                <div class="carry-over">
-                    יתרה מצטברת: <span id="totalAccumulated" style="font-weight:bold">₪ 0</span>
+        <div class="grid">
+            <aside>
+                <div class="card balance-display">
+                    <span style="color: var(--text-dim); font-size: 0.85rem;">יתרה חודשית</span>
+                    <div id="balanceVal" class="balance-val">₪ 0</div>
+                    <div class="carry-over">
+                        יתרה מצטברת: <b id="totalAccumulated">₪ 0</b>
+                    </div>
                 </div>
-            </div>
 
-            <div class="summary">
-                <div>הכנסות: <span id="totalIncome" style="color:var(--income)">₪0</span></div>
-                <div>הוצאות: <span id="totalExpense" style="color:var(--expense)">₪0</span></div>
-                <div>נטו: <span id="netBalance">₪0</span></div>
-            </div>
-
-            <div class="card">
-                <h3>הוספה / עריכת תנועה</h3>
-                <div class="form-grid">
-                    <input type="text" id="desc" placeholder="תיאור" class="full-width">
-                    <input type="number" id="amt" placeholder="סכום">
-                    <select id="type">
-                        <option value="income">הכנסה</option>
-                        <option value="expense">הוצאה</option>
-                        <option value="fixed">קבועה</option>
-                    </select>
-                    <button class="btn-submit full-width" id="submitBtn" onclick="addItem()">הוסף תנועה</button>
+                <div class="summary">
+                    <div class="summary-item"><span>הכנסות</span><b id="totalIncome" style="color:var(--income)">₪0</b></div>
+                    <div class="summary-item"><span>הוצאות</span><b id="totalExpense" style="color:var(--expense)">₪0</b></div>
+                    <div class="summary-item net-card"><span>נטו חודשי</span><b id="netBalance">₪0</b></div>
                 </div>
-            </div>
 
-            <div class="card">
-                <h3>ניתוח נטל קבוע</h3>
-                <div style="font-size: 12px;">
-                    אחוז מההכנסה: <span id="fixedText" style="font-weight:bold">0%</span>
+                <div class="card">
+                    <h3>הוספת תנועה</h3>
+                    <div class="form-grid">
+                        <input type="text" id="desc" placeholder="תיאור" class="full-width">
+                        <input type="number" id="amt" placeholder="סכום">
+                        <select id="type">
+                            <option value="income">הכנסה</option>
+                            <option value="expense">הוצאה</option>
+                            <option value="fixed">קבועה</option>
+                        </select>
+                        <button class="btn-submit full-width" id="submitBtn" onclick="addItem()">בצע</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>ניתוח נטל קבוע</h3>
+                    <div style="font-size: 13px; margin-bottom: 5px;">
+                        אחוז מההכנסה: <b id="fixedText">0%</b>
+                    </div>
                     <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
+                    <div class="chart-box" style="height:160px; margin-top: 15px;"><canvas id="mainChart"></canvas></div>
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button onclick="exportData()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">גיבוי</button>
+                        <button onclick="document.getElementById('fileIn').click()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">שחזור</button>
+                        <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
+                    </div>
                 </div>
-                <div class="chart-box" style="height:140px;"><canvas id="mainChart"></canvas></div>
-                <div style="display:flex; gap:5px; margin-top:15px;">
-                    <button onclick="exportData()" style="flex:1; font-size:10px; cursor:pointer;">גיבוי JSON</button>
-                    <button onclick="document.getElementById('fileIn').click()" style="flex:1; font-size:10px; cursor:pointer;">שחזור</button>
-                    <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
-                </div>
-            </div>
-        </aside>
+            </aside>
 
-        <main class="list-section">
-            <div class="card" style="display: flex; flex-direction: column;">
-                <h3>פירוט תנועות - <span id="labelMonth"></span></h3>
-                <div id="list" class="scroll-area"></div>
-            </div>
-            
-            <div class="card">
-                <h3>מבט שנתי (השוואת חודשים)</h3>
-                <div class="chart-box" style="height: 220px;"><canvas id="monthlyChart"></canvas></div>
-            </div>
-        </main>
+            <main>
+                <div class="card">
+                    <h3>פירוט תנועות - <span id="labelMonth" style="color:var(--accent)"></span></h3>
+                    <div id="list" class="scroll-area"></div>
+                </div>
+                
+                <div class="card">
+                    <h3>מגמה שנתית</h3>
+                    <div class="chart-box" style="height: 280px;"><canvas id="monthlyChart"></canvas></div>
+                </div>
+            </main>
+        </div>
+
+        <footer>&copy; 2026 אלכסנדר זבודיסקר</footer>
     </div>
-
-    <footer>&copy; 2026 אלכסנדר זבודיסקר</footer>
 </div>
 
 <script>
-// --- פונקציית כניסה ---
-function checkLogin() {
-    const passInput = document.getElementById("pass-input").value;
-    if (passInput === "0000") {
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("app-content").style.display = "block";
-        initCharts();
-        render();
-    } else {
-        document.getElementById("error-msg").style.display = "block";
-        document.getElementById("pass-input").value = "";
-    }
+// --- פונקציית שגיאה מודרנית ---
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.querySelector('span').innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => { t.classList.remove('show'); }, 3000);
 }
 
-// תמיכה בלחיצה על Enter במקלדת לכניסה
-document.getElementById("pass-input").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        checkLogin();
-    }
-});
+function checkLogin() {
+    if (document.getElementById("pass-input").value === "0000") {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-content").style.display = "block";
+        initCharts(); render();
+    } else { document.getElementById("error-msg").style.display = "block"; }
+}
+document.getElementById("pass-input").addEventListener("keypress", (e) => { if(e.key === "Enter") checkLogin(); });
 
-// --- לוגיקה של האפליקציה ---
 let data = JSON.parse(localStorage.getItem('budget_db')) || [];
 let viewDate = new Date();
 let mainChart, monthlyChart;
 let editingId = null;
 
 function initCharts() {
-    mainChart = new Chart(document.getElementById('mainChart'), {
+    const ctx1 = document.getElementById('mainChart').getContext('2d');
+    mainChart = new Chart(ctx1, {
         type: 'doughnut',
-        data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#27ae60','#e74c3c','#f39c12'], borderWidth: 1 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }, cutout: '70%' }
+        data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#22c55e','#ef4444','#f59e0b'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10 } } }, cutout: '75%' }
     });
 
-    monthlyChart = new Chart(document.getElementById('monthlyChart'), {
+    const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+    monthlyChart = new Chart(ctx2, {
         type: 'bar',
         data: { labels: [], datasets: [
-            { label:'הכנסה', backgroundColor:'#27ae60', data:[] },
-            { label:'הוצאה', backgroundColor:'#e74c3c', data:[] },
-            { label:'קבועה', backgroundColor:'#f39c12', data:[] }
+            { label:'הכנסה', backgroundColor:'#22c55e', data:[] },
+            { label:'הוצאה', backgroundColor:'#ef4444', data:[] },
+            { label:'קבועה', backgroundColor:'#f59e0b', data:[] }
         ]},
         options: { 
             responsive:true, maintainAspectRatio: false, 
-            plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, font:{size:10} } } }, 
-            scales:{ y:{ beginAtZero:true, stacked: true }, x:{ stacked: true } } 
+            plugins:{ legend:{ labels:{ color: '#94a3b8' } } }, 
+            scales:{ 
+                y:{ beginAtZero:true, stacked: true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8'} }, 
+                x:{ stacked: true, grid:{display:false}, ticks:{color:'#94a3b8'} } 
+            } 
         }
     });
 }
@@ -214,18 +277,25 @@ function initCharts() {
 function addItem() {
     const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
     const amtVal = parseFloat(a.value);
-    if(!d.value || isNaN(amtVal) || amtVal <= 0){ alert('נא להזין תיאור וסכום תקין'); return; }
+
+    // שימוש בשגיאה המודרנית
+    if (!d.value.trim()) {
+        showToast("נא להזין תיאור לתנועה");
+        return;
+    }
+    if (isNaN(amtVal) || amtVal <= 0) {
+        showToast("נא להזין סכום תקין וגדול מ-0");
+        return;
+    }
 
     if(editingId){
         const item = data.find(i=>i.id===editingId);
         if(item) { item.desc = d.value; item.amt = amtVal; item.type = t.value; }
-        editingId = null;
-        document.getElementById('submitBtn').innerText = "הוסף תנועה";
+        editingId = null; document.getElementById('submitBtn').innerText = "בצע";
     } else {
         data.push({ id: Date.now(), desc:d.value, amt:amtVal, type:t.value, date:viewDate.toISOString() });
     }
-    d.value=''; a.value='';
-    save();
+    d.value=''; a.value=''; save();
 }
 
 function editItem(id){
@@ -234,26 +304,16 @@ function editItem(id){
     document.getElementById('desc').value = item.desc;
     document.getElementById('amt').value = item.amt;
     document.getElementById('type').value = item.type;
-    document.getElementById('submitBtn').innerText = "עדכן תנועה";
-    editingId = id;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('submitBtn').innerText = "עדכן";
+    editingId = id; window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function deleteItem(id){
-    if(!confirm('למחוק את התנועה הזו?')) return;
-    data = data.filter(i=>i.id!==id);
-    save();
+    if(!confirm('למחוק?')) return;
+    data = data.filter(i=>i.id!==id); save();
 }
 
-function moveMonth(n){ 
-    viewDate.setMonth(viewDate.getMonth()+n); 
-    editingId = null;
-    document.getElementById('desc').value = '';
-    document.getElementById('amt').value = '';
-    document.getElementById('submitBtn').innerText = "הוסף תנועה";
-    render(); 
-}
-
+function moveMonth(n){ viewDate.setMonth(viewDate.getMonth()+n); render(); }
 function save(){ localStorage.setItem('budget_db',JSON.stringify(data)); render(); }
 
 function render(){
@@ -271,11 +331,21 @@ function render(){
         totals[i.type]+=i.amt;
         const itemDiv = document.createElement('div');
         itemDiv.className = `item ${i.type}`;
-        itemDiv.innerHTML = `<span>${i.desc}</span><div style="display:flex;align-items:center;gap:10px;"><span dir="ltr" style="font-weight:bold">${i.type==='income'?'+':'-'} ₪${i.amt.toLocaleString()}</span><button onclick="editItem(${i.id})" style="border:none;background:none;cursor:pointer;">✏️</button><button onclick="deleteItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#ddd;">🗑</button></div>`;
+        itemDiv.innerHTML = `<span>${i.desc}</span><div style="display:flex;align-items:center;gap:15px;"><span dir="ltr" style="font-weight:700">${i.type==='income'?'+':'-'} ₪${i.amt.toLocaleString()}</span><button onclick="editItem(${i.id})" style="border:none;background:none;cursor:pointer;font-size:16px;">✏️</button><button onclick="deleteItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#555;">🗑</button></div>`;
         list.appendChild(itemDiv);
     });
 
-    const currentBal = totals.income-(totals.expense+totals.fixed);
+    const net = totals.income - (totals.expense + totals.fixed);
+    const totalExp = totals.expense + totals.fixed;
+
+    document.getElementById('totalIncome').innerText=`₪${totals.income.toLocaleString()}`;
+    document.getElementById('totalExpense').innerText=`₪${totalExp.toLocaleString()}`;
+    
+    const netEl = document.getElementById('netBalance');
+    netEl.innerText=`₪${net.toLocaleString()}`;
+    netEl.style.color = net < 0 ? 'var(--expense)' : 'var(--income)';
+
+    const currentBal = net;
     document.getElementById('balanceVal').innerText=`₪ ${currentBal.toLocaleString()}`;
     document.getElementById('balanceVal').style.color=currentBal < 0 ? 'var(--expense)' : 'var(--income)';
 
@@ -287,10 +357,6 @@ function render(){
     },0);
     document.getElementById('totalAccumulated').innerText=`₪ ${accumulatedBal.toLocaleString()}`;
     document.getElementById('totalAccumulated').style.color=accumulatedBal<0?'var(--expense)':'var(--income)';
-
-    document.getElementById('totalIncome').innerText=`₪${totals.income.toLocaleString()}`;
-    document.getElementById('totalExpense').innerText=`₪${(totals.expense+totals.fixed).toLocaleString()}`;
-    document.getElementById('netBalance').innerText=`₪${currentBal.toLocaleString()}`;
 
     if(mainChart){ mainChart.data.datasets[0].data=[totals.income,totals.expense,totals.fixed]; mainChart.update(); }
     const fixP = totals.income > 0 ? Math.floor((totals.fixed/totals.income)*100) : 0;
