@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ניהול כספי הבית - Premium App</title>
+    <title>ניהול כספי הבית - Premium Dark</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -25,70 +25,122 @@
             --accent: #38bdf8;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        body { 
+        html, body { 
+            max-width: 100%;
+            overflow-x: hidden;
             background: radial-gradient(circle at top right, #1e293b, #0f172a);
             color: var(--text-main);
             font-family: 'Segoe UI', system-ui, sans-serif;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
+        /* --- הודעת שגיאה מודרנית (Toast) --- */
         #toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: rgba(239, 68, 68, 0.9); color: white; padding: 12px 25px; border-radius: 12px;
-            backdrop-filter: blur(10px); z-index: 10000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 10000;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
 
+        /* מסך כניסה */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--primary-bg); display: flex; justify-content: center; align-items: center; z-index: 9999;
+            background: var(--primary-bg); display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
         }
+
         .login-card {
-            background: var(--glass-bg); backdrop-filter: blur(12px); padding: 40px; border-radius: 24px;
-            text-align: center; border: 1px solid var(--glass-border); width: 85%; max-width: 340px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 40px; border-radius: 24px; text-align: center;
+            border: 1px solid var(--glass-border);
+            width: 85%; max-width: 340px;
         }
+
+        .login-card img { width: 70px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent)); }
         .login-card input { 
-            width: 100%; padding: 15px; margin-bottom: 15px; background: rgba(0,0,0,0.2);
-            border: 1px solid var(--glass-border); border-radius: 12px; color: white; text-align: center; font-size: 20px; outline: none;
+            width: 100%; padding: 15px; margin-bottom: 15px; 
+            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
+            border-radius: 12px; color: white; text-align: center; font-size: 20px; outline: none;
+        }
+        .login-card button { 
+            width: 100%; padding: 15px; background: var(--accent); color: var(--primary-bg); 
+            border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 18px;
         }
 
-        #app-content { display: none; padding: 15px; max-width: 1100px; margin: 0 auto; }
-        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        /* תוכן האפליקציה */
+        #app-content { display: none; padding: 15px; width: 100%; }
+        .container { max-width: 1100px; margin: 0 auto; width: 100%; }
 
-        .card { background: var(--glass-bg); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px; }
-        
+        header { text-align: center; padding: 10px 0 25px 0; }
+        h1 { font-size: 1.6rem; font-weight: 600; background: linear-gradient(to left, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
         .month-nav {
             display: flex; justify-content: center; align-items: center; gap: 20px;
-            background: var(--glass-bg); padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border); margin-bottom: 20px;
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border); margin-bottom: 20px;
         }
         .nav-btn { background: none; border: 1px solid var(--glass-border); color: white; cursor: pointer; padding: 5px 15px; border-radius: 8px; font-size: 18px; }
+
+        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; width: 100%; }
+
+        .card { 
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border);
+            margin-bottom: 20px; width: 100%;
+        }
+        .card h3 { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px; text-transform: uppercase; }
+
+        .balance-display { text-align: center; padding: 20px; }
+        .balance-val { font-size: 2rem; font-weight: 700; margin: 5px 0; }
+        .carry-over { color: var(--text-dim); font-size: 0.85rem; padding-top: 10px; border-top: 1px solid var(--glass-border); }
 
         .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .summary-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--glass-border); }
         .summary-item span { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
+        .summary-item b { font-size: 0.95rem; }
         .net-card { grid-column: span 2; background: rgba(255,255,255,0.03); }
 
-        input, select { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; width: 100%; margin-bottom: 10px; }
-        .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .full-width { grid-column: span 2; }
+        input, select { 
+            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); 
+            color: white; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; width: 100%;
+        }
+        .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; border: none; cursor: pointer; padding: 12px; border-radius: 10px; font-size: 15px; }
 
-        .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 8px; margin: 10px 0; }
-        .progress-fill { height: 100%; border-radius: 20px; background: var(--fixed); transition: width 0.5s; }
-
-        .scroll-area { max-height: 400px; overflow-y: auto; }
+        .scroll-area { max-height: 400px; overflow-y: auto; padding-right: 5px; }
         .item { 
-            display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 10px; 
-            background: rgba(255,255,255,0.03); border-radius: 14px; border-right: 4px solid #444; 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.03);
+            border-radius: 14px; border-right: 4px solid #444; width: 100%;
         }
         .income { border-right-color: var(--income); }
         .expense { border-right-color: var(--expense); }
         .fixed { border-right-color: var(--fixed); }
 
+        .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 8px; margin: 10px 0; width: 100%; }
+        .progress-fill { height: 100%; border-radius: 20px; background: var(--fixed); box-shadow: 0 0 10px var(--fixed); transition: width 0.5s; }
+
         footer { text-align: center; color: var(--text-dim); font-size: 11px; padding: 40px; }
+
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -97,121 +149,128 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <img src="icon.png" style="width:80px; border-radius:15px; margin-bottom:20px; box-shadow: 0 0 20px var(--accent);" onerror="this.src='https://cdn-icons-png.flaticon.com/512/6195/6195699.png'">
+        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png">
         <h2>כניסה למערכת</h2>
         <input type="password" id="pass-input" placeholder="סיסמה">
-        <button class="btn-submit" onclick="handleLogin()">פתיחה</button>
-        <p id="error-msg" style="color:var(--expense); display:none; margin-top:10px;">סיסמה שגויה</p>
+        <button onclick="checkLogin()">פתיחה</button>
+        <p id="error-msg" style="color:var(--expense); display:none; margin-top:10px; font-size: 14px;">סיסמה שגויה, נסה שוב</p>
     </div>
 </div>
 
 <div id="app-content">
-    <header style="text-align:center; padding-bottom: 20px;">
-        <h1 style="background: linear-gradient(to left, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ניהול כספי הבית</h1>
-    </header>
+    <div class="container">
+        <header>
+            <h1>ניהול כספי הבית</h1>
+        </header>
 
-    <div class="month-nav">
-        <button class="nav-btn" onclick="moveMonth(-1)">◀</button>
-        <span id="monthTitle" style="font-weight: 600; min-width: 120px; text-align: center;"></span>
-        <button class="nav-btn" onclick="moveMonth(1)">▶</button>
-    </div>
+        <div class="month-nav">
+            <button class="nav-btn" onclick="moveMonth(-1)">◀</button>
+            <span id="monthTitle" style="font-weight: 600; font-size: 1.1rem; min-width: 120px; text-align: center;"></span>
+            <button class="nav-btn" onclick="moveMonth(1)">▶</button>
+        </div>
 
-    <div class="grid">
-        <aside>
-            <div class="card" style="text-align:center;">
-                <span style="color: var(--text-dim); font-size: 0.85rem;">יתרה חודשית</span>
-                <div id="balanceVal" style="font-size: 2.2rem; font-weight: 700; margin: 5px 0;">₪ 0</div>
-                <div style="font-size: 0.85rem; color: var(--text-dim); border-top: 1px solid var(--glass-border); padding-top: 10px; margin-top: 10px;">
-                    יתרה מצטברת: <b id="totalAccumulated">₪ 0</b>
+        <div class="grid">
+            <aside>
+                <div class="card balance-display">
+                    <span style="color: var(--text-dim); font-size: 0.85rem;">יתרה חודשית</span>
+                    <div id="balanceVal" class="balance-val">₪ 0</div>
+                    <div class="carry-over">
+                        יתרה מצטברת: <b id="totalAccumulated">₪ 0</b>
+                    </div>
                 </div>
-            </div>
 
-            <div class="summary">
-                <div class="summary-item"><span>הכנסות</span><b id="totalIncome" style="color:var(--income)">₪0</b></div>
-                <div class="summary-item"><span>הוצאות</span><b id="totalExpense" style="color:var(--expense)">₪0</b></div>
-                <div class="summary-item net-card"><span>נטו חודשי</span><b id="netBalance">₪0</b></div>
-            </div>
-
-            <div class="card">
-                <h3 id="formTitle">הוספת תנועה</h3>
-                <br>
-                <input type="text" id="desc" placeholder="תיאור">
-                <input type="number" id="amt" placeholder="סכום">
-                <select id="type">
-                    <option value="income">הכנסה</option>
-                    <option value="expense">הוצאה</option>
-                    <option value="fixed">קבועה</option>
-                </select>
-                <button class="btn-submit" id="submitBtn" onclick="addItem()">בצע</button>
-            </div>
-
-            <div class="card">
-                <h3>ניתוח נטל קבוע</h3>
-                <div style="font-size: 13px; margin: 10px 0 5px 0;">אחוז מההכנסה: <b id="fixedText">0%</b></div>
-                <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
-                <div style="display:flex; gap:10px; margin-top:20px;">
-                    <button onclick="exportData()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">גיבוי</button>
-                    <button onclick="document.getElementById('fileIn').click()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">שחזור</button>
-                    <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
+                <div class="summary">
+                    <div class="summary-item"><span>הכנסות</span><b id="totalIncome" style="color:var(--income)">₪0</b></div>
+                    <div class="summary-item"><span>הוצאות</span><b id="totalExpense" style="color:var(--expense)">₪0</b></div>
+                    <div class="summary-item net-card"><span>נטו חודשי</span><b id="netBalance">₪0</b></div>
                 </div>
-            </div>
-        </aside>
 
-        <main>
-            <div class="card">
-                <h3>פירוט תנועות - <span id="labelMonth" style="color:var(--accent)"></span></h3>
-                <div id="list" class="scroll-area" style="margin-top:15px;"></div>
-            </div>
-            
-            <div class="card">
-                <h3>מגמה שנתית</h3>
-                <div style="height: 280px; margin-top:15px;"><canvas id="monthlyChart"></canvas></div>
-            </div>
-        </main>
+                <div class="card">
+                    <h3>הוספת תנועה</h3>
+                    <div class="form-grid">
+                        <input type="text" id="desc" placeholder="תיאור" class="full-width">
+                        <input type="number" id="amt" placeholder="סכום">
+                        <select id="type">
+                            <option value="income">הכנסה</option>
+                            <option value="expense">הוצאה</option>
+                            <option value="fixed">קבועה</option>
+                        </select>
+                        <button class="btn-submit full-width" id="submitBtn" onclick="addItem()">בצע</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>ניתוח נטל קבוע</h3>
+                    <div style="font-size: 13px; margin-bottom: 5px;">
+                        אחוז מההכנסה: <b id="fixedText">0%</b>
+                    </div>
+                    <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
+                    <div class="chart-box" style="height:160px; margin-top: 15px;"><canvas id="mainChart"></canvas></div>
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button onclick="exportData()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">גיבוי</button>
+                        <button onclick="document.getElementById('fileIn').click()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">שחזור</button>
+                        <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
+                    </div>
+                </div>
+            </aside>
+
+            <main>
+                <div class="card">
+                    <h3>פירוט תנועות - <span id="labelMonth" style="color:var(--accent)"></span></h3>
+                    <div id="list" class="scroll-area"></div>
+                </div>
+                
+                <div class="card">
+                    <h3>מגמה שנתית</h3>
+                    <div class="chart-box" style="height: 280px;"><canvas id="monthlyChart"></canvas></div>
+                </div>
+            </main>
+        </div>
+
+        <footer>&copy; 2026 אלכסנדר זבודיסקר</footer>
     </div>
-    <footer>&copy; 2026 אלכסנדר זבודיסקר</footer>
 </div>
 
 <script>
-// PWA Registration
+// --- תוספת PWA: רישום ה-Service Worker ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
     });
 }
 
-// Security: Password 0000
-const SECURE_HASH = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0"; 
-async function sha256(msg) {
-    const buf = new TextEncoder().encode(msg);
-    const hash = await crypto.subtle.digest('SHA-256', buf);
-    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+// --- פונקציית שגיאה מודרנית ---
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.querySelector('span').innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => { t.classList.remove('show'); }, 3000);
 }
 
-async function handleLogin() {
-    const input = document.getElementById("pass-input").value;
-    if (await sha256(input) === SECURE_HASH) {
+function checkLogin() {
+    if (document.getElementById("pass-input").value === "0000") {
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("app-content").style.display = "block";
         initCharts(); render();
     } else { document.getElementById("error-msg").style.display = "block"; }
 }
-
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.querySelector('span').innerText = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-}
+document.getElementById("pass-input").addEventListener("keypress", (e) => { if(e.key === "Enter") checkLogin(); });
 
 let data = JSON.parse(localStorage.getItem('budget_db')) || [];
 let viewDate = new Date();
-let monthlyChart = null;
+let mainChart, monthlyChart;
 let editingId = null;
 
 function initCharts() {
-    const ctx = document.getElementById('monthlyChart').getContext('2d');
-    monthlyChart = new Chart(ctx, {
+    const ctx1 = document.getElementById('mainChart').getContext('2d');
+    mainChart = new Chart(ctx1, {
+        type: 'doughnut',
+        data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#22c55e','#ef4444','#f59e0b'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10 } } }, cutout: '75%' }
+    });
+
+    const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+    monthlyChart = new Chart(ctx2, {
         type: 'bar',
         data: { labels: [], datasets: [
             { label:'הכנסה', backgroundColor:'#22c55e', data:[] },
@@ -220,122 +279,131 @@ function initCharts() {
         ]},
         options: { 
             responsive:true, maintainAspectRatio: false, 
-            plugins:{ legend:{ labels:{ color: '#94a3b8', boxWidth: 10 } } },
+            plugins:{ legend:{ labels:{ color: '#94a3b8' } } }, 
             scales:{ 
-                y:{ stacked: true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8'} },
-                x:{ stacked: true, grid:{display:false}, ticks:{color:'#94a3b8'} }
-            }
+                y:{ beginAtZero:true, stacked: true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8'} }, 
+                x:{ stacked: true, grid:{display:false}, ticks:{color:'#94a3b8'} } 
+            } 
         }
     });
 }
 
 function addItem() {
     const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
-    const val = parseFloat(a.value);
-    if (!d.value.trim() || isNaN(val) || val <= 0) { showToast("נתונים לא תקינים"); return; }
+    const amtVal = parseFloat(a.value);
 
-    if(editingId) {
-        const i = data.find(x => x.id === editingId);
-        if(i) { i.desc = d.value; i.amt = val; i.type = t.value; }
+    if (!d.value.trim()) {
+        showToast("נא להזין תיאור לתנועה");
+        return;
+    }
+    if (isNaN(amtVal) || amtVal <= 0) {
+        showToast("נא להזין סכום תקין וגדול מ-0");
+        return;
+    }
+
+    if(editingId){
+        const item = data.find(i=>i.id===editingId);
+        if(item) { item.desc = d.value; item.amt = amtVal; item.type = t.value; }
         editingId = null; document.getElementById('submitBtn').innerText = "בצע";
     } else {
-        data.push({ id: Date.now(), desc: d.value, amt: val, type: t.value, date: viewDate.toISOString() });
+        data.push({ id: Date.now(), desc:d.value, amt:amtVal, type:t.value, date:viewDate.toISOString() });
     }
-    d.value = ''; a.value = ''; save();
+    d.value=''; a.value=''; save();
 }
 
-function editItem(id) {
-    const i = data.find(x => x.id === id);
-    if(!i) return;
-    document.getElementById('desc').value = i.desc;
-    document.getElementById('amt').value = i.amt;
-    document.getElementById('type').value = i.type;
+function editItem(id){
+    const item = data.find(i=>i.id===id);
+    if(!item) return;
+    document.getElementById('desc').value = item.desc;
+    document.getElementById('amt').value = item.amt;
+    document.getElementById('type').value = item.type;
     document.getElementById('submitBtn').innerText = "עדכן";
     editingId = id; window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function deleteItem(id) {
+function deleteItem(id){
     if(!confirm('למחוק?')) return;
-    data = data.filter(x => x.id !== id); save();
+    data = data.filter(i=>i.id!==id); save();
 }
 
-function moveMonth(n) { viewDate.setMonth(viewDate.getMonth() + n); render(); }
-function save() { localStorage.setItem('budget_db', JSON.stringify(data)); render(); }
+function moveMonth(n){ viewDate.setMonth(viewDate.getMonth()+n); render(); }
+function save(){ localStorage.setItem('budget_db',JSON.stringify(data)); render(); }
 
-function render() {
-    const months = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
-    const m = viewDate.getMonth(), y = viewDate.getFullYear();
-    document.getElementById('monthTitle').innerText = `${months[m]} ${y}`;
-    document.getElementById('labelMonth').innerText = months[m];
+function render(){
+    const months=["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+    const m=viewDate.getMonth(), y=viewDate.getFullYear();
+    document.getElementById('monthTitle').innerText=`${months[m]} ${y}`;
+    document.getElementById('labelMonth').innerText=months[m];
 
-    const currentData = data.filter(i => {
-        const d = new Date(i.date);
-        return d.getMonth() === m && d.getFullYear() === y;
+    const currentData = data.filter(i=>{ const d=new Date(i.date); return d.getMonth()===m && d.getFullYear()===y; });
+    const list=document.getElementById('list');
+    list.innerHTML='';
+    
+    let totals={income:0,expense:0,fixed:0};
+    currentData.slice().sort((a,b)=>b.id-a.id).forEach(i=>{
+        totals[i.type]+=i.amt;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `item ${i.type}`;
+        itemDiv.innerHTML = `<span>${i.desc}</span><div style="display:flex;align-items:center;gap:15px;"><span dir="ltr" style="font-weight:700">${i.type==='income'?'+':'-'} ₪${i.amt.toLocaleString()}</span><button onclick="editItem(${i.id})" style="border:none;background:none;cursor:pointer;font-size:16px;">✏️</button><button onclick="deleteItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#555;">🗑</button></div>`;
+        list.appendChild(itemDiv);
     });
 
-    const list = document.getElementById('list');
-    list.innerHTML = '';
-    let mInc = 0, mExp = 0, mFix = 0;
+    const net = totals.income - (totals.expense + totals.fixed);
+    const totalExp = totals.expense + totals.fixed;
 
-    currentData.slice().reverse().forEach(i => {
-        if(i.type==='income') mInc+=i.amt; else if(i.type==='expense') mExp+=i.amt; else mFix+=i.amt;
-        const div = document.createElement('div');
-        div.className = `item ${i.type}`;
-        div.innerHTML = `
-            <div><div style="font-weight:600">${i.desc}</div><div style="font-size:0.7rem; color:var(--text-dim)">${new Date(i.date).toLocaleDateString('he-IL')}</div></div>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <span dir="ltr" style="font-weight:700">₪${i.amt.toLocaleString()}</span>
-                <button onclick="editItem(${i.id})" style="background:none; border:none; cursor:pointer;">✏️</button>
-                <button onclick="deleteItem(${i.id})" style="background:none; border:none; cursor:pointer;">🗑️</button>
-            </div>`;
-        list.appendChild(div);
-    });
+    document.getElementById('totalIncome').innerText=`₪${totals.income.toLocaleString()}`;
+    document.getElementById('totalExpense').innerText=`₪${totalExp.toLocaleString()}`;
+    
+    const netEl = document.getElementById('netBalance');
+    netEl.innerText=`₪${net.toLocaleString()}`;
+    netEl.style.color = net < 0 ? 'var(--expense)' : 'var(--income)';
 
-    const net = mInc - (mExp + mFix);
-    document.getElementById('totalIncome').innerText = `₪${mInc.toLocaleString()}`;
-    document.getElementById('totalExpense').innerText = `₪${(mExp + mFix).toLocaleString()}`;
-    document.getElementById('netBalance').innerText = `₪${net.toLocaleString()}`;
-    document.getElementById('netBalance').style.color = net < 0 ? 'var(--expense)' : 'var(--income)';
-    document.getElementById('balanceVal').innerText = `₪ ${net.toLocaleString()}`;
-    document.getElementById('balanceVal').style.color = net < 0 ? 'var(--expense)' : 'var(--income)';
+    const currentBal = net;
+    document.getElementById('balanceVal').innerText=`₪ ${currentBal.toLocaleString()}`;
+    document.getElementById('balanceVal').style.color=currentBal < 0 ? 'var(--expense)' : 'var(--income)';
 
-    const accumulated = data.reduce((acc, i) => {
-        const d = new Date(i.date);
-        return (d <= new Date(y, m, 31)) ? (i.type === 'income' ? acc + i.amt : acc - i.amt) : acc;
-    }, 0);
-    document.getElementById('totalAccumulated').innerText = `₪ ${accumulated.toLocaleString()}`;
+    const accumulatedBal = data.reduce((acc,i)=>{
+        const d=new Date(i.date);
+        const itemMonth=d.getMonth() + (d.getFullYear()*12);
+        const viewMonth=m+(y*12);
+        return (itemMonth <= viewMonth) ? (i.type==='income'?acc+i.amt:acc-i.amt) : acc;
+    },0);
+    document.getElementById('totalAccumulated').innerText=`₪ ${accumulatedBal.toLocaleString()}`;
+    document.getElementById('totalAccumulated').style.color=accumulatedBal<0?'var(--expense)':'var(--income)';
 
-    const fixP = mInc > 0 ? Math.floor((mFix/mInc)*100) : 0;
-    document.getElementById('fixedText').innerText = fixP + '%';
-    document.getElementById('fixedProgress').style.width = Math.min(fixP, 100) + '%';
+    if(mainChart){ mainChart.data.datasets[0].data=[totals.income,totals.expense,totals.fixed]; mainChart.update(); }
+    const fixP = totals.income > 0 ? Math.floor((totals.fixed/totals.income)*100) : 0;
+    document.getElementById('fixedText').innerText=fixP+'%';
+    document.getElementById('fixedProgress').style.width=Math.min(fixP,100)+'%';
 
-    // Chart
-    const cInc=[], cExp=[], cFix=[];
-    for(let i=0; i<12; i++) {
-        const mItems = data.filter(d => { const dt=new Date(d.date); return dt.getMonth()===i && dt.getFullYear()===y; });
+    const monthLabels=[]; const incomeData=[]; const expenseData=[]; const fixedData=[];
+    for(let i=0; i<12; i++){
+        monthLabels.push(months[i]);
+        const mItems=data.filter(d=> { const dt=new Date(d.date); return dt.getMonth()===i && dt.getFullYear()===y; });
         let inc=0, exp=0, fix=0;
-        mItems.forEach(it => { if(it.type==='income') inc+=it.amt; else if(it.type==='expense') exp+=it.amt; else fix+=it.amt; });
-        cInc.push(inc); cExp.push(exp); cFix.push(fix);
+        mItems.forEach(it=>{ if(it.type==='income') inc+=it.amt; else if(it.type==='expense') exp+=it.amt; else if(it.type==='fixed') fix+=it.amt; });
+        incomeData.push(inc); expenseData.push(exp); fixedData.push(fix);
     }
-    if(monthlyChart) {
-        monthlyChart.data.labels = months;
-        monthlyChart.data.datasets[0].data = cInc;
-        monthlyChart.data.datasets[1].data = cExp;
-        monthlyChart.data.datasets[2].data = cFix;
+    if(monthlyChart){
+        monthlyChart.data.labels=monthLabels;
+        monthlyChart.data.datasets[0].data=incomeData;
+        monthlyChart.data.datasets[1].data=expenseData;
+        monthlyChart.data.datasets[2].data=fixedData;
         monthlyChart.update();
     }
 }
 
-function exportData() {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:"application/json"}));
-    a.download = "budget_backup.json"; a.click();
+function exportData(){
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(data)], {type:"application/json"}));
+    a.download="budget_backup.json"; a.click();
 }
-function importData(e) {
-    const r = new FileReader();
-    r.onload = (ev) => { try { data = JSON.parse(ev.target.result); save(); } catch(e) { showToast("שגיאה בייבוא"); } };
+function importData(e){
+    const r=new FileReader();
+    r.onload=(ev)=>{ try{ data=JSON.parse(ev.target.result); save(); } catch(e){ alert('קובץ לא תקין'); } };
     r.readAsText(e.target.files[0]);
 }
 </script>
+
 </body>
 </html>
