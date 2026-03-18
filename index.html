@@ -78,13 +78,14 @@
         .expense { border-right-color: var(--expense); }
         .fixed { border-right-color: var(--fixed); }
 
-        input, select { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; }
-        .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; }
+        input, select { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; font-family: inherit; }
+        .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; border: none; }
         
         .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 8px; margin: 10px 0; }
         .progress-fill { height: 100%; border-radius: 20px; background: var(--fixed); transition: 0.5s; }
         
         .scroll-area { max-height: 400px; overflow-y: auto; }
+        .type-icon { margin-left: 8px; font-size: 1.1rem; }
         footer { text-align: center; color: var(--text-dim); font-size: 11px; padding: 40px; }
     </style>
 </head>
@@ -121,8 +122,8 @@
                 </div>
 
                 <div class="summary">
-                    <div class="summary-item"><span>הכנסות</span><b id="totalIncome" style="color:var(--income)">₪0</b></div>
-                    <div class="summary-item"><span>הוצאות</span><b id="totalExpense" style="color:var(--expense)">₪0</b></div>
+                    <div class="summary-item"><span>הכנסות 💰</span><b id="totalIncome" style="color:var(--income)">₪0</b></div>
+                    <div class="summary-item"><span>הוצאות 💸</span><b id="totalExpense" style="color:var(--expense)">₪0</b></div>
                 </div>
 
                 <div class="card">
@@ -130,15 +131,15 @@
                     <input type="text" id="desc" placeholder="תיאור">
                     <input type="number" id="amt" placeholder="סכום">
                     <select id="type">
-                        <option value="income">הכנסה</option>
-                        <option value="expense">הוצאה</option>
-                        <option value="fixed">קבועה</option>
+                        <option value="income">💰 הכנסה</option>
+                        <option value="expense">💸 הוצאה</option>
+                        <option value="fixed">📅 קבועה</option>
                     </select>
                     <button class="btn-submit" id="submitBtn" onclick="addItem()">בצע</button>
                 </div>
 
                 <div class="card">
-                    <h3>נטל קבוע: <b id="fixedText">0%</b></h3>
+                    <h3>נטל קבוע 📅: <b id="fixedText">0%</b></h3>
                     <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
                     <div style="height:150px;"><canvas id="mainChart"></canvas></div>
                     <div style="display:flex; gap:5px; margin-top:15px;">
@@ -169,6 +170,12 @@ let data = JSON.parse(localStorage.getItem('budget_db')) || [];
 let viewDate = new Date();
 let mainChart, monthlyChart;
 let editingId = null;
+
+const icons = {
+    income: '💰',
+    expense: '💸',
+    fixed: '📅'
+};
 
 function showToast(msg) {
     const t = document.getElementById('toast');
@@ -201,7 +208,7 @@ function initCharts() {
             { label:'הוצאה', backgroundColor:'#ef4444', data:[] },
             { label:'קבועה', backgroundColor:'#f59e0b', data:[] }
         ]},
-        options: { responsive:true, maintainAspectRatio: false, scales: { y: { stacked:true, beginAtZero:true }, x: { stacked:true } } }
+        options: { responsive:true, maintainAspectRatio: false, scales: { y: { stacked:true, beginAtZero:true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8'} }, x: { stacked:true, grid:{display:false}, ticks:{color:'#94a3b8'} } }, plugins:{ legend:{ labels:{color:'#94a3b8'} } } }
     });
 }
 
@@ -243,7 +250,7 @@ function render() {
         totals[x.type] += x.amt;
         const div = document.createElement('div');
         div.className = `item ${x.type}`;
-        div.innerHTML = `<span>${x.desc}</span><div style="display:flex; gap:15px; align-items:center;"><b>₪${x.amt.toLocaleString()}</b><button onclick="editItem(${x.id})" style="background:none; border:none; cursor:pointer;">✏️</button><button onclick="deleteItem(${x.id})" style="background:none; border:none; cursor:pointer;">🗑️</button></div>`;
+        div.innerHTML = `<span><span class="type-icon">${icons[x.type] || ''}</span>${x.desc}</span><div style="display:flex; gap:15px; align-items:center;"><b>₪${x.amt.toLocaleString()}</b><button onclick="editItem(${x.id})" style="background:none; border:none; cursor:pointer;">✏️</button><button onclick="deleteItem(${x.id})" style="background:none; border:none; cursor:pointer;">🗑️</button></div>`;
         list.appendChild(div);
     });
 
