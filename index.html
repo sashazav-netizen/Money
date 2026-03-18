@@ -35,7 +35,6 @@
             overflow-x: hidden;
         }
 
-        /* Toast Message */
         #toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: rgba(239, 68, 68, 0.9); color: white; padding: 12px 25px; border-radius: 12px;
@@ -44,7 +43,6 @@
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* Login Screen */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--primary-bg); display: flex; justify-content: center; align-items: center; z-index: 9999;
@@ -58,35 +56,29 @@
             border: 1px solid var(--glass-border); border-radius: 12px; color: white; text-align: center; font-size: 20px; outline: none;
         }
 
-        /* Main Layout */
         #app-content { display: none; padding: 15px; max-width: 1100px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 
         .card { background: var(--glass-bg); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px; }
         
-        /* Navigation */
         .month-nav {
             display: flex; justify-content: center; align-items: center; gap: 20px;
             background: var(--glass-bg); padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border); margin-bottom: 20px;
         }
         .nav-btn { background: none; border: 1px solid var(--glass-border); color: white; cursor: pointer; padding: 5px 15px; border-radius: 8px; font-size: 18px; }
 
-        /* Summary Stats */
         .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .summary-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--glass-border); }
         .summary-item span { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
         .net-card { grid-column: span 2; background: rgba(255,255,255,0.03); }
 
-        /* Forms */
         input, select { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; width: 100%; margin-bottom: 10px; }
         .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; }
 
-        /* Progress Bar */
         .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 8px; margin: 10px 0; }
-        .progress-fill { height: 100%; border-radius: 20px; background: var(--fixed); transition: width 0.5s; box-shadow: 0 0 10px var(--fixed); }
+        .progress-fill { height: 100%; border-radius: 20px; background: var(--fixed); transition: width 0.5s; }
 
-        /* List Items */
         .scroll-area { max-height: 400px; overflow-y: auto; }
         .item { 
             display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 10px; 
@@ -114,7 +106,7 @@
 </div>
 
 <div id="app-content">
-    <header style="text-align:center; padding: 10px 0 20px 0;">
+    <header style="text-align:center; padding-bottom: 20px;">
         <h1 style="background: linear-gradient(to left, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ניהול כספי הבית</h1>
     </header>
 
@@ -155,9 +147,7 @@
 
             <div class="card">
                 <h3>ניתוח נטל קבוע</h3>
-                <div style="font-size: 13px; margin: 10px 0 5px 0;">
-                    אחוז מההכנסה: <b id="fixedText">0%</b>
-                </div>
+                <div style="font-size: 13px; margin: 10px 0 5px 0;">אחוז מההכנסה: <b id="fixedText">0%</b></div>
                 <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
                 <div style="display:flex; gap:10px; margin-top:20px;">
                     <button onclick="exportData()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">גיבוי</button>
@@ -183,14 +173,14 @@
 </div>
 
 <script>
-// PWA Logic
+// PWA Registration
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(() => {});
     });
 }
 
-// Security
+// Security: Password 0000
 const SECURE_HASH = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0"; 
 async function sha256(msg) {
     const buf = new TextEncoder().encode(msg);
@@ -214,7 +204,6 @@ function showToast(msg) {
     setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// Data Management
 let data = JSON.parse(localStorage.getItem('budget_db')) || [];
 let viewDate = new Date();
 let monthlyChart = null;
@@ -243,11 +232,11 @@ function initCharts() {
 function addItem() {
     const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
     const val = parseFloat(a.value);
-    if (!d.value.trim() || isNaN(val) || val <= 0) { showToast("נא להזין נתונים תקינים"); return; }
+    if (!d.value.trim() || isNaN(val) || val <= 0) { showToast("נתונים לא תקינים"); return; }
 
     if(editingId) {
-        const item = data.find(i => i.id === editingId);
-        if(item) { item.desc = d.value; item.amt = val; item.type = t.value; }
+        const i = data.find(x => x.id === editingId);
+        if(i) { i.desc = d.value; i.amt = val; i.type = t.value; }
         editingId = null; document.getElementById('submitBtn').innerText = "בצע";
     } else {
         data.push({ id: Date.now(), desc: d.value, amt: val, type: t.value, date: viewDate.toISOString() });
@@ -256,18 +245,18 @@ function addItem() {
 }
 
 function editItem(id) {
-    const item = data.find(i => i.id === id);
-    if(!item) return;
-    document.getElementById('desc').value = item.desc;
-    document.getElementById('amt').value = item.amt;
-    document.getElementById('type').value = item.type;
+    const i = data.find(x => x.id === id);
+    if(!i) return;
+    document.getElementById('desc').value = i.desc;
+    document.getElementById('amt').value = i.amt;
+    document.getElementById('type').value = i.type;
     document.getElementById('submitBtn').innerText = "עדכן";
     editingId = id; window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function deleteItem(id) {
-    if(!confirm('למחוק תנועה?')) return;
-    data = data.filter(i => i.id !== id); save();
+    if(!confirm('למחוק?')) return;
+    data = data.filter(x => x.id !== id); save();
 }
 
 function moveMonth(n) { viewDate.setMonth(viewDate.getMonth() + n); render(); }
@@ -315,13 +304,12 @@ function render() {
         return (d <= new Date(y, m, 31)) ? (i.type === 'income' ? acc + i.amt : acc - i.amt) : acc;
     }, 0);
     document.getElementById('totalAccumulated').innerText = `₪ ${accumulated.toLocaleString()}`;
-    document.getElementById('totalAccumulated').style.color = accumulated < 0 ? 'var(--expense)' : 'var(--income)';
 
     const fixP = mInc > 0 ? Math.floor((mFix/mInc)*100) : 0;
     document.getElementById('fixedText').innerText = fixP + '%';
     document.getElementById('fixedProgress').style.width = Math.min(fixP, 100) + '%';
 
-    // Chart update
+    // Chart
     const cInc=[], cExp=[], cFix=[];
     for(let i=0; i<12; i++) {
         const mItems = data.filter(d => { const dt=new Date(d.date); return dt.getMonth()===i && dt.getFullYear()===y; });
@@ -345,7 +333,7 @@ function exportData() {
 }
 function importData(e) {
     const r = new FileReader();
-    r.onload = (ev) => { try { data = JSON.parse(ev.target.result); save(); } catch(e) { showToast("קובץ לא תקין"); } };
+    r.onload = (ev) => { try { data = JSON.parse(ev.target.result); save(); } catch(e) { showToast("שגיאה בייבוא"); } };
     r.readAsText(e.target.files[0]);
 }
 </script>
