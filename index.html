@@ -37,107 +37,55 @@
         }
 
         #toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(239, 68, 68, 0.9);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 10000;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            pointer-events: none;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(239, 68, 68, 0.9); color: white; padding: 12px 25px; border-radius: 12px;
+            backdrop-filter: blur(10px); z-index: 10000; transition: 0.4s; font-weight: 600; pointer-events: none;
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
 
         #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--primary-bg); display: flex; justify-content: center; align-items: center;
-            z-index: 9999;
+            position: fixed; inset: 0; background: var(--primary-bg);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
         }
-
         .login-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            padding: 40px; border-radius: 24px; text-align: center;
-            border: 1px solid var(--glass-border);
-            width: 85%; max-width: 340px;
+            background: var(--glass-bg); backdrop-filter: blur(12px); padding: 40px; border-radius: 24px;
+            text-align: center; border: 1px solid var(--glass-border); width: 85%; max-width: 340px;
         }
-
-        .login-card img { width: 70px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent)); }
-        .login-card input { 
-            width: 100%; padding: 15px; margin-bottom: 15px; 
-            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
-            border-radius: 12px; color: white; text-align: center; font-size: 20px; outline: none;
-        }
-        .login-card button { 
-            width: 100%; padding: 15px; background: var(--accent); color: var(--primary-bg); 
-            border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 18px;
-        }
+        .login-card input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-size: 20px; }
+        .login-card button { width: 100%; padding: 15px; background: var(--accent); color: var(--primary-bg); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
         #app-content { display: none; padding: 15px; width: 100%; }
-        .container { max-width: 1100px; margin: 0 auto; width: 100%; }
+        .container { max-width: 1100px; margin: 0 auto; }
 
         header { text-align: center; padding: 10px 0 25px 0; }
-        h1 { font-size: 1.6rem; font-weight: 600; background: linear-gradient(to left, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h1 { font-size: 1.6rem; background: linear-gradient(to left, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .month-nav {
-            display: flex; justify-content: center; align-items: center; gap: 20px;
-            background: var(--glass-bg); backdrop-filter: blur(10px);
-            padding: 12px; border-radius: 16px; border: 1px solid var(--glass-border); margin-bottom: 20px;
-        }
-        .nav-btn { background: none; border: 1px solid var(--glass-border); color: white; cursor: pointer; padding: 5px 15px; border-radius: 8px; font-size: 18px; }
+        .month-nav { display: flex; justify-content: center; align-items: center; gap: 20px; background: var(--glass-bg); padding: 12px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--glass-border); }
+        .nav-btn { background: none; border: 1px solid var(--glass-border); color: white; cursor: pointer; padding: 5px 15px; border-radius: 8px; }
 
-        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; width: 100%; }
+        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 
-        .card { 
-            background: var(--glass-bg); backdrop-filter: blur(10px);
-            padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border);
-            margin-bottom: 20px; width: 100%;
-        }
-        .card h3 { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px; text-transform: uppercase; }
-
-        .balance-display { text-align: center; padding: 20px; }
-        .balance-val { font-size: 2rem; font-weight: 700; margin: 5px 0; }
-        .carry-over { color: var(--text-dim); font-size: 0.85rem; padding-top: 10px; border-top: 1px solid var(--glass-border); }
-
+        .card { background: var(--glass-bg); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px; }
+        .balance-val { font-size: 2rem; font-weight: 700; text-align: center; margin: 10px 0; }
+        
         .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .summary-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--glass-border); }
-        .summary-item span { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
-        .summary-item b { font-size: 0.95rem; }
-        .net-card { grid-column: span 2; background: rgba(255,255,255,0.03); }
+        .summary-item span { display: block; font-size: 0.7rem; color: var(--text-dim); }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .full-width { grid-column: span 2; }
-        input, select { 
-            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); 
-            color: white; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; width: 100%;
-        }
-        .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; border: none; cursor: pointer; padding: 12px; border-radius: 10px; font-size: 15px; }
-
-        .scroll-area { max-height: 400px; overflow-y: auto; padding-right: 5px; }
-        .item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.03);
-            border-radius: 14px; border-right: 4px solid #444; width: 100%;
-        }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 15px; margin-bottom: 10px; background: rgba(255,255,255,0.03); border-radius: 14px; border-right: 4px solid #444; }
         .income { border-right-color: var(--income); }
         .expense { border-right-color: var(--expense); }
         .fixed { border-right-color: var(--fixed); }
 
-        .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 8px; margin: 10px 0; width: 100%; }
-        .progress-fill { height: 100%; border-radius: 20px; background: var(--fixed); box-shadow: 0 0 10px var(--fixed); transition: width 0.5s; }
-
+        input, select { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; }
+        .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; }
+        
+        .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 8px; margin: 10px 0; }
+        .progress-fill { height: 100%; border-radius: 20px; background: var(--fixed); transition: 0.5s; }
+        
+        .scroll-area { max-height: 400px; overflow-y: auto; }
         footer { text-align: center; color: var(--text-dim); font-size: 11px; padding: 40px; }
-
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -146,32 +94,28 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png" width="70">
         <h2>כניסה למערכת</h2>
         <input type="password" id="pass-input" placeholder="סיסמה">
         <button onclick="checkLogin()">פתיחה</button>
-        <p id="error-msg" style="color:var(--expense); display:none; margin-top:10px; font-size: 14px;">סיסמה שגויה, נסה שוב</p>
     </div>
 </div>
 
 <div id="app-content">
     <div class="container">
-        <header>
-            <h1>ניהול כספי הבית</h1>
-        </header>
-
+        <header><h1>ניהול כספי הבית</h1></header>
         <div class="month-nav">
             <button class="nav-btn" onclick="moveMonth(-1)">◀</button>
-            <span id="monthTitle" style="font-weight: 600; font-size: 1.1rem; min-width: 120px; text-align: center;"></span>
+            <span id="monthTitle" style="font-weight: 600;"></span>
             <button class="nav-btn" onclick="moveMonth(1)">▶</button>
         </div>
 
         <div class="grid">
             <aside>
-                <div class="card balance-display">
-                    <span style="color: var(--text-dim); font-size: 0.85rem;">יתרה חודשית</span>
+                <div class="card">
+                    <div style="text-align:center; color:var(--text-dim); font-size:0.8rem;">יתרה חודשית</div>
                     <div id="balanceVal" class="balance-val">₪ 0</div>
-                    <div class="carry-over">
+                    <div style="text-align:center; border-top:1px solid var(--glass-border); padding-top:10px; font-size:0.8rem;">
                         יתרה מצטברת: <b id="totalAccumulated">₪ 0</b>
                     </div>
                 </div>
@@ -179,33 +123,27 @@
                 <div class="summary">
                     <div class="summary-item"><span>הכנסות</span><b id="totalIncome" style="color:var(--income)">₪0</b></div>
                     <div class="summary-item"><span>הוצאות</span><b id="totalExpense" style="color:var(--expense)">₪0</b></div>
-                    <div class="summary-item net-card"><span>נטו חודשי</span><b id="netBalance">₪0</b></div>
                 </div>
 
                 <div class="card">
-                    <h3>הוספת תנועה</h3>
-                    <div class="form-grid">
-                        <input type="text" id="desc" placeholder="תיאור" class="full-width">
-                        <input type="number" id="amt" placeholder="סכום">
-                        <select id="type">
-                            <option value="income">הכנסה</option>
-                            <option value="expense">הוצאה</option>
-                            <option value="fixed">קבועה</option>
-                        </select>
-                        <button class="btn-submit full-width" id="submitBtn" onclick="addItem()">בצע</button>
-                    </div>
+                    <h3>הוספת תנועה</h3><br>
+                    <input type="text" id="desc" placeholder="תיאור">
+                    <input type="number" id="amt" placeholder="סכום">
+                    <select id="type">
+                        <option value="income">הכנסה</option>
+                        <option value="expense">הוצאה</option>
+                        <option value="fixed">קבועה</option>
+                    </select>
+                    <button class="btn-submit" id="submitBtn" onclick="addItem()">בצע</button>
                 </div>
 
                 <div class="card">
-                    <h3>ניתוח נטל קבוע</h3>
-                    <div style="font-size: 13px; margin-bottom: 5px;">
-                        אחוז מההכנסה: <b id="fixedText">0%</b>
-                    </div>
+                    <h3>נטל קבוע: <b id="fixedText">0%</b></h3>
                     <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
-                    <div class="chart-box" style="height:160px; margin-top: 15px;"><canvas id="mainChart"></canvas></div>
-                    <div style="display:flex; gap:10px; margin-top:20px;">
-                        <button onclick="exportData()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">גיבוי</button>
-                        <button onclick="document.getElementById('fileIn').click()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; padding:8px; border-radius:8px; font-size:11px; cursor:pointer;">שחזור</button>
+                    <div style="height:150px;"><canvas id="mainChart"></canvas></div>
+                    <div style="display:flex; gap:5px; margin-top:15px;">
+                        <button onclick="exportData()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; font-size:10px; padding:5px; cursor:pointer;">גיבוי</button>
+                        <button onclick="document.getElementById('fileIn').click()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; font-size:10px; padding:5px; cursor:pointer;">שחזור</button>
                         <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
                     </div>
                 </div>
@@ -213,27 +151,30 @@
 
             <main>
                 <div class="card">
-                    <h3>פירוט תנועות - <span id="labelMonth" style="color:var(--accent)"></span></h3>
+                    <h3>פירוט תנועות - <span id="labelMonth" style="color:var(--accent)"></span></h3><br>
                     <div id="list" class="scroll-area"></div>
                 </div>
-                
                 <div class="card">
                     <h3>מגמה שנתית</h3>
-                    <div class="chart-box" style="height: 280px;"><canvas id="monthlyChart"></canvas></div>
+                    <div style="height: 250px;"><canvas id="monthlyChart"></canvas></div>
                 </div>
             </main>
         </div>
-
         <footer>&copy; 2026 אלכסנדר זבודיסקר</footer>
     </div>
 </div>
 
 <script>
+let data = JSON.parse(localStorage.getItem('budget_db')) || [];
+let viewDate = new Date();
+let mainChart, monthlyChart;
+let editingId = null;
+
 function showToast(msg) {
     const t = document.getElementById('toast');
     t.querySelector('span').innerText = msg;
     t.classList.add('show');
-    setTimeout(() => { t.classList.remove('show'); }, 3000);
+    setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 function checkLogin() {
@@ -241,21 +182,15 @@ function checkLogin() {
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("app-content").style.display = "block";
         initCharts(); render();
-    } else { document.getElementById("error-msg").style.display = "block"; }
+    } else { alert("סיסמה שגויה"); }
 }
-document.getElementById("pass-input").addEventListener("keypress", (e) => { if(e.key === "Enter") checkLogin(); });
-
-let data = JSON.parse(localStorage.getItem('budget_db')) || [];
-let viewDate = new Date();
-let mainChart, monthlyChart;
-let editingId = null;
 
 function initCharts() {
     const ctx1 = document.getElementById('mainChart').getContext('2d');
     mainChart = new Chart(ctx1, {
         type: 'doughnut',
         data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#22c55e','#ef4444','#f59e0b'], borderWidth: 0 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10 } } }, cutout: '75%' }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display:false } }, cutout: '80%' }
     });
 
     const ctx2 = document.getElementById('monthlyChart').getContext('2d');
@@ -266,84 +201,77 @@ function initCharts() {
             { label:'הוצאה', backgroundColor:'#ef4444', data:[] },
             { label:'קבועה', backgroundColor:'#f59e0b', data:[] }
         ]},
-        options: { 
-            responsive:true, maintainAspectRatio: false, 
-            plugins:{ legend:{ labels:{ color: '#94a3b8' } } }, 
-            scales:{ 
-                y:{ beginAtZero:true, stacked: true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8'} }, 
-                x:{ stacked: true, grid:{display:false}, ticks:{color:'#94a3b8'} } 
-            } 
-        }
+        options: { responsive:true, maintainAspectRatio: false, scales: { y: { stacked:true, beginAtZero:true }, x: { stacked:true } } }
     });
 }
 
 function addItem() {
     const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
-    const amtVal = parseFloat(a.value);
-    if (!d.value.trim()) { showToast("נא להזין תיאור"); return; }
-    if (isNaN(amtVal) || amtVal <= 0) { showToast("סכום לא תקין"); return; }
+    if (!d.value || !a.value) { showToast("מלא את כל השדות"); return; }
     if(editingId){
-        const item = data.find(i=>i.id===editingId);
-        if(item) { item.desc = d.value; item.amt = amtVal; item.type = t.value; }
-        editingId = null; document.getElementById('submitBtn').innerText = "בצע";
+        const i = data.find(x=>x.id===editingId);
+        i.desc=d.value; i.amt=parseFloat(a.value); i.type=t.value;
+        editingId=null; document.getElementById('submitBtn').innerText="בצע";
     } else {
-        data.push({ id: Date.now(), desc:d.value, amt:amtVal, type:t.value, date:viewDate.toISOString() });
+        data.push({ id: Date.now(), desc: d.value, amt: parseFloat(a.value), type: t.value, date: viewDate.toISOString() });
     }
     d.value=''; a.value=''; save();
 }
 
-function editItem(id){
-    const item = data.find(i=>i.id===id);
-    if(!item) return;
-    document.getElementById('desc').value = item.desc;
-    document.getElementById('amt').value = item.amt;
-    document.getElementById('type').value = item.type;
-    document.getElementById('submitBtn').innerText = "עדכן";
-    editingId = id; window.scrollTo({ top: 0, behavior: 'smooth' });
+function deleteItem(id) { if(confirm('למחוק?')) { data = data.filter(x=>x.id!==id); save(); } }
+function editItem(id) {
+    const i = data.find(x=>x.id===id);
+    document.getElementById('desc').value=i.desc; document.getElementById('amt').value=i.amt; document.getElementById('type').value=i.type;
+    editingId=id; document.getElementById('submitBtn').innerText="עדכן";
 }
 
-function deleteItem(id){
-    if(!confirm('למחוק?')) return;
-    data = data.filter(i=>i.id!==id); save();
-}
+function moveMonth(n) { viewDate.setMonth(viewDate.getMonth()+n); render(); }
+function save() { localStorage.setItem('budget_db', JSON.stringify(data)); render(); }
 
-function moveMonth(n){ viewDate.setMonth(viewDate.getMonth()+n); render(); }
-function save(){ localStorage.setItem('budget_db',JSON.stringify(data)); render(); }
+function render() {
+    const months = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+    const m = viewDate.getMonth(), y = viewDate.getFullYear();
+    document.getElementById('monthTitle').innerText = `${months[m]} ${y}`;
+    document.getElementById('labelMonth').innerText = months[m];
 
-function render(){
-    const months=["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
-    const m=viewDate.getMonth(), y=viewDate.getFullYear();
-    document.getElementById('monthTitle').innerText=`${months[m]} ${y}`;
-    document.getElementById('labelMonth').innerText=months[m];
-    const currentData = data.filter(i=>{ const d=new Date(i.date); return d.getMonth()===m && d.getFullYear()===y; });
-    const list=document.getElementById('list');
-    list.innerHTML='';
-    let totals={income:0,expense:0,fixed:0};
-    currentData.slice().sort((a,b)=>b.id-a.id).forEach(i=>{
-        totals[i.type]+=i.amt;
-        const itemDiv = document.createElement('div');
-        itemDiv.className = `item ${i.type}`;
-        itemDiv.innerHTML = `<span>${i.desc}</span><div style="display:flex;align-items:center;gap:15px;"><span dir="ltr" style="font-weight:700">${i.type==='income'?'+':'-'} ₪${i.amt.toLocaleString()}</span><button onclick="editItem(${i.id})" style="border:none;background:none;cursor:pointer;font-size:16px;">✏️</button><button onclick="deleteItem(${i.id})" style="border:none;background:none;cursor:pointer;color:#555;">🗑</button></div>`;
-        list.appendChild(itemDiv);
+    const currentData = data.filter(x => { const d = new Date(x.date); return d.getMonth()===m && d.getFullYear()===y; });
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    let totals = {income:0, expense:0, fixed:0};
+
+    currentData.sort((a,b)=>b.id-a.id).forEach(x => {
+        totals[x.type] += x.amt;
+        const div = document.createElement('div');
+        div.className = `item ${x.type}`;
+        div.innerHTML = `<span>${x.desc}</span><div style="display:flex; gap:15px; align-items:center;"><b>₪${x.amt.toLocaleString()}</b><button onclick="editItem(${x.id})" style="background:none; border:none; cursor:pointer;">✏️</button><button onclick="deleteItem(${x.id})" style="background:none; border:none; cursor:pointer;">🗑️</button></div>`;
+        list.appendChild(div);
     });
+
     const net = totals.income - (totals.expense + totals.fixed);
-    document.getElementById('totalIncome').innerText=`₪${totals.income.toLocaleString()}`;
-    document.getElementById('totalExpense').innerText=`₪${(totals.expense + totals.fixed).toLocaleString()}`;
-    const netEl = document.getElementById('netBalance');
-    netEl.innerText=`₪${net.toLocaleString()}`;
-    netEl.style.color = net < 0 ? 'var(--expense)' : 'var(--income)';
-    document.getElementById('balanceVal').innerText=`₪ ${net.toLocaleString()}`;
-    document.getElementById('balanceVal').style.color=net < 0 ? 'var(--expense)' : 'var(--income)';
-    const accumulatedBal = data.reduce((acc,i)=>{
-        const d=new Date(i.date);
-        return (d.getMonth() + d.getFullYear()*12 <= m + y*12) ? (i.type==='income'?acc+i.amt:acc-i.amt) : acc;
-    },0);
-    document.getElementById('totalAccumulated').innerText=`₪ ${accumulatedBal.toLocaleString()}`;
-    if(mainChart){ mainChart.data.datasets[0].data=[totals.income,totals.expense,totals.fixed]; mainChart.update(); }
+    document.getElementById('totalIncome').innerText = `₪${totals.income.toLocaleString()}`;
+    document.getElementById('totalExpense').innerText = `₪${(totals.expense + totals.fixed).toLocaleString()}`;
+    document.getElementById('balanceVal').innerText = `₪${net.toLocaleString()}`;
+    document.getElementById('balanceVal').style.color = net >= 0 ? 'var(--income)' : 'var(--expense)';
+
+    const acc = data.reduce((sum, x) => {
+        const d = new Date(x.date);
+        return (d.getFullYear()*12 + d.getMonth() <= y*12 + m) ? (x.type==='income' ? sum+x.amt : sum-x.amt) : sum;
+    }, 0);
+    document.getElementById('totalAccumulated').innerText = `₪${acc.toLocaleString()}`;
+
+    if(mainChart) { mainChart.data.datasets[0].data = [totals.income, totals.expense, totals.fixed]; mainChart.update(); }
     const fixP = totals.income > 0 ? Math.floor((totals.fixed/totals.income)*100) : 0;
-    document.getElementById('fixedText').innerText=fixP+'%';
-    document.getElementById('fixedProgress').style.width=Math.min(fixP,100)+'%';
-    if(monthlyChart){ /* עדכון מגמה שנתית כאן */ monthlyChart.update(); }
+    document.getElementById('fixedText').innerText = fixP + '%';
+    document.getElementById('fixedProgress').style.width = Math.min(fixP, 100) + '%';
+
+    const incD=[], expD=[], fixD=[];
+    for(let i=0; i<12; i++) {
+        const mData = data.filter(x => new Date(x.date).getMonth()===i && new Date(x.date).getFullYear()===y);
+        incD.push(mData.filter(x=>x.type==='income').reduce((s,x)=>s+x.amt,0));
+        expD.push(mData.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amt,0));
+        fixD.push(mData.filter(x=>x.type==='fixed').reduce((s,x)=>s+x.amt,0));
+    }
+    if(monthlyChart) { monthlyChart.data.labels=months; monthlyChart.data.datasets[0].data=incD; monthlyChart.data.datasets[1].data=expD; monthlyChart.data.datasets[2].data=fixD; monthlyChart.update(); }
 }
 
 function exportData(){
@@ -357,11 +285,8 @@ function importData(e){
     r.readAsText(e.target.files[0]);
 }
 
-// התוספת לרישום ה-Service Worker (הכרחי להתקנה כאפליקציה)
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
-  });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); });
 }
 </script>
 </body>
