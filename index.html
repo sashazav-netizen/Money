@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ניהול כספי הבית - Premium Dark</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon.png">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -232,13 +225,6 @@
 </div>
 
 <script>
-// --- תוספת PWA: רישום ה-Service Worker ---
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
-    });
-}
-
 // --- פונקציית שגיאה מודרנית ---
 function showToast(msg) {
     const t = document.getElementById('toast');
@@ -292,6 +278,7 @@ function addItem() {
     const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
     const amtVal = parseFloat(a.value);
 
+    // שימוש בשגיאה המודרנית
     if (!d.value.trim()) {
         showToast("נא להזין תיאור לתנועה");
         return;
