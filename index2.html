@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ניהול כספי הבית</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/6195/6195699.png">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --income: #22c55e;
+            --expense: #ef4444;
+            --fixed: #f59e0b;
+            --accent: #38bdf8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: radial-gradient(circle at top right, #1e293b, #0f172a); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(239, 68, 68, 0.9); color: white; padding: 12px 25px; border-radius: 12px;
+            backdrop-filter: blur(10px); z-index: 10000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        #login-screen {
+            position: fixed; inset: 0; background: var(--primary-bg);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .login-card {
+            background: var(--glass-bg); backdrop-filter: blur(12px); padding: 40px; border-radius: 24px;
+            border: 1px solid var(--glass-border); width: 85%; max-width: 340px; text-align: center;
+        }
+        .login-card input { width: 100%; padding: 15px; margin: 20px 0; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white; text-align: center; font-size: 24px; outline: none; }
+        .login-card button { width: 100%; padding: 15px; background: var(--accent); color: var(--primary-bg); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px; }
+
+        #app-content { display: none; padding: 15px; max-width: 1100px; margin: 0 auto; }
+        header { text-align: center; padding: 20px 0; }
+        h1 { font-size: 1.8rem; background: linear-gradient(to left, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .month-nav { display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--glass-border); }
+        .nav-btn { background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; padding: 8px 16px; border-radius: 8px; font-size: 18px; }
+
+        .grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+        @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
+
+        .card { background: var(--glass-bg); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px; position: relative; }
+        .balance-val { font-size: 2.2rem; font-weight: 800; text-align: center; margin: 10px 0; letter-spacing: -1px; }
+        
+        .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .summary-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 16px; text-align: center; border: 1px solid var(--glass-border); }
+        .summary-item span { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 5px; }
+
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 16px; margin-bottom: 12px; background: rgba(255,255,255,0.03); border-radius: 14px; border-right: 4px solid #444; transition: 0.2s; }
+        .income { border-right-color: var(--income); }
+        .expense { border-right-color: var(--expense); }
+        .fixed { border-right-color: var(--fixed); }
+
+        input, select { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 14px; border-radius: 12px; width: 100%; margin-bottom: 12px; outline: none; font-size: 16px; }
+        .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; padding: 14px; border-radius: 12px; width: 100%; cursor: pointer; border: none; font-size: 16px; }
+        
+        .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 10px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--fixed); box-shadow: 0 0 15px var(--fixed); transition: 0.6s cubic-bezier(0.1, 0, 0, 1); }
+        
+        .scroll-area { max-height: 450px; overflow-y: auto; padding-left: 5px; }
+        .type-icon { margin-left: 10px; }
+        footer { text-align: center; color: var(--text-dim); font-size: 12px; padding: 40px; opacity: 0.6; }
+
+        /* כפתורי פעולה בתוך פריט */
+        .actions { display: flex; gap: 12px; align-items: center; }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 18px; opacity: 0.7; transition: 0.2s; }
+        .action-btn:hover { opacity: 1; transform: scale(1.1); }
+    </style>
+</head>
+<body>
+
+<div id="toast">⚠️ <span>הודעה</span></div>
+
+<div id="login-screen">
+    <div class="login-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png" width="80" style="filter: drop-shadow(0 0 10px var(--accent))">
+        <h2 style="margin-top:15px">כניסה מאובטחת</h2>
+        <input type="password" id="pass-input" placeholder="הזן סיסמה" autofocus>
+        <button onclick="checkLogin()">פתיחה</button>
+    </div>
+</div>
+
+<div id="app-content">
+    <header><h1>ניהול כספי הבית</h1></header>
+    
+    <div class="month-nav">
+        <button class="nav-btn" onclick="moveMonth(-1)">◀</button>
+        <h2 id="monthTitle" style="font-size: 1.2rem;"></h2>
+        <button class="nav-btn" onclick="moveMonth(1)">▶</button>
+    </div>
+
+    <div class="grid">
+        <aside>
+            <div class="card">
+                <div style="text-align:center; color:var(--text-dim); font-size:0.85rem;">יתרה חודשית</div>
+                <div id="balanceVal" class="balance-val">₪ 0</div>
+                <div style="text-align:center; border-top:1px solid var(--glass-border); padding-top:12px; margin-top:10px; font-size:0.85rem; color:var(--text-dim);">
+                    יתרה מצטברת: <b id="totalAccumulated" style="color:var(--text-main)">₪ 0</b>
+                </div>
+            </div>
+
+            <div class="summary">
+                <div class="summary-item"><span>הכנסות 💰</span><b id="totalIncome" style="color:var(--income); font-size:1.1rem;">₪0</b></div>
+                <div class="summary-item"><span>הוצאות 💸</span><b id="totalExpense" style="color:var(--expense); font-size:1.1rem;">₪0</b></div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom:15px; font-size:1rem;">הוספת תנועה</h3>
+                <input type="text" id="desc" placeholder="תיאור (למשל: סופר)">
+                <input type="number" id="amt" placeholder="סכום">
+                <select id="type">
+                    <option value="income">💰 הכנסה</option>
+                    <option value="expense">💸 הוצאה</option>
+                    <option value="fixed">📅 הוצאה קבועה</option>
+                </select>
+                <button class="btn-submit" id="submitBtn" onclick="addItem()">הוסף למערכת</button>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size:0.9rem; margin-bottom:10px;">נטל קבוע 📅: <b id="fixedText">0%</b></h3>
+                <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
+                <div style="height:140px; margin-top:15px;"><canvas id="mainChart"></canvas></div>
+                
+                <div style="display:flex; gap:8px; margin-top:20px;">
+                    <button onclick="exportData()" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); color:white; font-size:11px; padding:10px; border-radius:8px; cursor:pointer;">גיבוי</button>
+                    <button onclick="document.getElementById('fileIn').click()" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); color:white; font-size:11px; padding:10px; border-radius:8px; cursor:pointer;">שחזור</button>
+                    <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="card">
+                <h3 style="font-size:1rem;">פירוט תנועות - <span id="labelMonth" style="color:var(--accent)"></span></h3>
+                <div id="list" class="scroll-area" style="margin-top:20px;"></div>
+            </div>
+            <div class="card">
+                <h3 style="font-size:1rem; margin-bottom:15px;">מגמה שנתית</h3>
+                <div style="height: 280px;"><canvas id="monthlyChart"></canvas></div>
+            </div>
+        </main>
+    </div>
+    <footer>כל הזכויות שמורות &copy; 2026 אלכסנדר זבודיסקר</footer>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem('budget_db')) || [];
+let viewDate = new Date();
+let mainChart = null, monthlyChart = null;
+let editingId = null;
+
+const icons = { income: '💰', expense: '💸', fixed: '📅' };
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.querySelector('span').innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// בדיקת כניסה - הוספת האזנה למקש Enter
+document.getElementById('pass-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') checkLogin();
+});
+
+function checkLogin() {
+    const val = document.getElementById("pass-input").value;
+    if (val === "0000") {
+        document.getElementById("login-screen").style.opacity = "0";
+        setTimeout(() => {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("app-content").style.display = "block";
+            initCharts(); 
+            render();
+        }, 400);
+    } else {
+        showToast("סיסמה שגויה, נסה שוב");
+        document.getElementById("pass-input").value = "";
+    }
+}
+
+function initCharts() {
+    const ctx1 = document.getElementById('mainChart').getContext('2d');
+    if(mainChart) mainChart.destroy();
+    mainChart = new Chart(ctx1, {
+        type: 'doughnut',
+        data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#22c55e','#ef4444','#f59e0b'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display:false } }, cutout: '80%' }
+    });
+
+    const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+    if(monthlyChart) monthlyChart.destroy();
+    monthlyChart = new Chart(ctx2, {
+        type: 'bar',
+        data: { labels: [], datasets: [
+            { label:'הכנסה', backgroundColor:'#22c55e', data:[], borderRadius: 5 },
+            { label:'הוצאה', backgroundColor:'#ef4444', data:[], borderRadius: 5 },
+            { label:'קבועה', backgroundColor:'#f59e0b', data:[], borderRadius: 5 }
+        ]},
+        options: { 
+            responsive:true, 
+            maintainAspectRatio: false, 
+            scales: { 
+                y: { stacked:true, beginAtZero:true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8'} }, 
+                x: { stacked:true, grid:{display:false}, ticks:{color:'#94a3b8'} } 
+            },
+            plugins:{ legend:{ position:'bottom', labels:{color:'#94a3b8', padding:20} } }
+        }
+    });
+}
+
+function addItem() {
+    const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
+    if (!d.value || !a.value) { showToast("חובה למלא תיאור וסכום"); return; }
+    
+    if(editingId){
+        const i = data.find(x=>x.id===editingId);
+        i.desc=d.value; i.amt=parseFloat(a.value); i.type=t.value;
+        editingId=null; 
+        document.getElementById('submitBtn').innerText="הוסף למערכת";
+    } else {
+        data.push({ id: Date.now(), desc: d.value, amt: parseFloat(a.value), type: t.value, date: viewDate.toISOString() });
+    }
+    d.value=''; a.value=''; save();
+}
+
+function deleteItem(id) {
+    if(confirm('למחוק את התנועה הזו?')) {
+        data = data.filter(x=>x.id!==id);
+        save();
+    }
+}
+
+function editItem(id) {
+    const i = data.find(x=>x.id===id);
+    document.getElementById('desc').value=i.desc;
+    document.getElementById('amt').value=i.amt;
+    document.getElementById('type').value=i.type;
+    editingId=id;
+    document.getElementById('submitBtn').innerText="עדכן תנועה";
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function moveMonth(n) { viewDate.setMonth(viewDate.getMonth()+n); render(); }
+function save() { localStorage.setItem('budget_db', JSON.stringify(data)); render(); }
+
+function render() {
+    const months = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+    const m = viewDate.getMonth(), y = viewDate.getFullYear();
+    document.getElementById('monthTitle').innerText = `${months[m]} ${y}`;
+    document.getElementById('labelMonth').innerText = months[m];
+
+    const currentData = data.filter(x => { 
+        const d = new Date(x.date); 
+        return d.getMonth()===m && d.getFullYear()===y; 
+    });
+
+    const list = document.getElementById('list');
+    list.innerHTML = currentData.length === 0 ? '<div style="text-align:center; color:var(--text-dim); padding:20px;">אין תנועות לחודש זה</div>' : '';
+    
+    let totals = {income:0, expense:0, fixed:0};
+
+    currentData.sort((a,b)=>b.id-a.id).forEach(x => {
+        totals[x.type] += x.amt;
+        const div = document.createElement('div');
+        div.className = `item ${x.type}`;
+        div.innerHTML = `
+            <span><span class="type-icon">${icons[x.type]}</span>${x.desc}</span>
+            <div class="actions">
+                <b dir="ltr">₪${x.amt.toLocaleString()}</b>
+                <button class="action-btn" onclick="editItem(${x.id})">✏️</button>
+                <button class="action-btn" onclick="deleteItem(${x.id})">🗑️</button>
+            </div>`;
+        list.appendChild(div);
+    });
+
+    const net = totals.income - (totals.expense + totals.fixed);
+    document.getElementById('totalIncome').innerText = `₪${totals.income.toLocaleString()}`;
+    document.getElementById('totalExpense').innerText = `₪${(totals.expense + totals.fixed).toLocaleString()}`;
+    document.getElementById('balanceVal').innerText = `₪${net.toLocaleString()}`;
+    document.getElementById('balanceVal').style.color = net >= 0 ? 'var(--income)' : 'var(--expense)';
+
+    const acc = data.reduce((sum, x) => {
+        const d = new Date(x.date);
+        return (d.getFullYear()*12 + d.getMonth() <= y*12 + m) ? (x.type==='income' ? sum+x.amt : sum-x.amt) : sum;
+    }, 0);
+    document.getElementById('totalAccumulated').innerText = `₪${acc.toLocaleString()}`;
+
+    // עדכון גרף עוגה
+    if(mainChart) {
+        mainChart.data.datasets[0].data = [totals.income, totals.expense, totals.fixed];
+        mainChart.update();
+    }
+
+    // עדכון פרוגרס בר
+    const fixP = totals.income > 0 ? Math.floor((totals.fixed/totals.income)*100) : 0;
+    document.getElementById('fixedText').innerText = fixP + '%';
+    document.getElementById('fixedProgress').style.width = Math.min(fixP, 100) + '%';
+
+    // עדכון גרף שנתי
+    const incD=[], expD=[], fixD=[];
+    for(let i=0; i<12; i++) {
+        const mData = data.filter(x => {
+            const d = new Date(x.date);
+            return d.getMonth()===i && d.getFullYear()===y;
+        });
+        incD.push(mData.filter(x=>x.type==='income').reduce((s,x)=>s+x.amt,0));
+        expD.push(mData.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amt,0));
+        fixD.push(mData.filter(x=>x.type==='fixed').reduce((s,x)=>s+x.amt,0));
+    }
+    if(monthlyChart) {
+        monthlyChart.data.labels=months;
+        monthlyChart.data.datasets[0].data=incD;
+        monthlyChart.data.datasets[1].data=expD;
+        monthlyChart.data.datasets[2].data=fixD;
+        monthlyChart.update();
+    }
+}
+
+function exportData(){
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(data)], {type:"application/json"}));
+    a.download=`budget_backup_${new Date().toLocaleDateString()}.json`; 
+    a.click();
+}
+
+function importData(e){
+    const r=new FileReader();
+    r.onload=(ev)=>{ 
+        try { 
+            data=JSON.parse(ev.target.result); 
+            save(); 
+            showToast("הנתונים שוחזרו בהצלחה");
+        } catch(e) { showToast("קובץ לא תקין"); } 
+    };
+    r.readAsText(e.target.files[0]);
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { 
+      navigator.serviceWorker.register('sw.js').catch(err => console.log(err)); 
+  });
+}
+</script>
+</body>
+</html>
