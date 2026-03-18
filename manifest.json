@@ -1,17 +1,18 @@
 {
-  "name": "ניהול כספי הבית",
-  "short_name": "כספים",
-  "description": "אפליקציית ניהול תקציב אישית",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "short_name": "תקציב",
+  "name": "ניהול כספי הבית - אלקסנדר",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/6195/6195699.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": "index.html",
+  "background_color": "#0f172a",
+  "display": "standalone",
+  "scope": "./",
+  "theme_color": "#38bdf8",
+  "description": "אפליקציית ניהול תקציב אישית"
 }
