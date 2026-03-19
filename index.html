@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>ניהול תקציב ביתי - אלכסנדר 2026</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -44,7 +45,6 @@
         .mini-card span { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
         .mini-card b { font-size: 0.9rem; white-space: nowrap; }
         .mini-card.highlight { border: 1px solid var(--balance); background: rgba(56, 189, 248, 0.1); transform: scale(1.05); }
-        .mini-card.highlight b { font-size: 1.1rem; }
 
         .chart-section { background: var(--glass); backdrop-filter: blur(12px); padding: 15px; border-radius: 20px; margin-bottom: 25px; border: 1px solid var(--glass-border); display: flex; justify-content: center; }
         .chart-container { height: 90px; width: 140px; }
@@ -56,39 +56,41 @@
         }
         .filter-btn.active { background: var(--accent); color: var(--bg); font-weight: 700; border-color: var(--accent); }
 
-        .item { 
-            background: var(--glass); backdrop-filter: blur(8px); margin-bottom: 8px; 
-            display: flex; justify-content: space-between; padding: 12px 15px; 
-            border-radius: 12px; border: 1px solid var(--glass-border); align-items: center;
-            transition: 0.2s;
-        }
-        .item:hover { transform: translateX(-5px); background: rgba(255,255,255,0.05); }
-        
-        /* פסי צבע לפי סוג פעולה */
-        .item.income { border-right: 4px solid var(--income); }
-        .item.expense { border-right: 4px solid var(--expense); }
-        .item.fixed { border-right: 4px solid var(--fixed); }
-
-        /* שאר העיצוב (טופס, מודלים וכו') נשאר כפי שהיה כדי לשמור על יציבות */
         .form-card { background: var(--glass); backdrop-filter: blur(12px); padding: 15px; border-radius: 18px; margin-bottom: 25px; border: 1px solid var(--glass-border); }
         .input-group { display: flex; gap: 8px; flex-wrap: wrap; }
         input, select, .btn-main { padding: 10px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.6); color: white; outline: none; font-size: 0.9rem; }
         input { flex: 2; min-width: 120px; }
-        select { flex: 1; min-width: 100px; }
-        .btn-main { background: var(--accent); color: var(--bg); font-weight: 900; cursor: pointer; border: none; flex: 1; }
+        select { flex: 1; min-width: 100px; cursor: pointer; }
+        .btn-main { background: var(--accent); color: var(--bg); font-weight: 900; cursor: pointer; border: none; flex: 1; transition: 0.2s; }
+
+        .list-container { border-radius: 18px; margin-bottom: 30px; }
+        .item { 
+            background: var(--glass); backdrop-filter: blur(8px); margin-bottom: 8px; 
+            display: flex; justify-content: space-between; padding: 12px 15px; 
+            border-radius: 12px; border: 1px solid var(--glass-border); align-items: center;
+        }
+        .item.income { border-right: 4px solid var(--income); }
+        .item.expense { border-right: 4px solid var(--expense); }
+        .item.fixed { border-right: 4px solid var(--fixed); }
+
+        .actions-bottom { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding-bottom: 20px; }
+        .action-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+        .action-btn.refresh { background: rgba(56, 189, 248, 0.15); color: var(--accent); border-color: var(--accent); }
 
         #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: var(--expense); color: white; padding: 12px 25px; border-radius: 12px; z-index: 10000; transition: 0.5s; opacity: 0; font-weight: 700; }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+        /* מודלים בעיצוב Glassmorphism */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 10001; }
-        .modal { background: var(--glass); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .modal { background: var(--glass); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes modalIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal h3 { margin-bottom: 10px; font-size: 1.3rem; }
+        .modal p { color: var(--text-dim); margin-bottom: 20px; font-size: 0.95rem; }
         .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; }
-        .btn-confirm { background: var(--expense); color: white; }
-        .btn-cancel { background: var(--glass-border); color: var(--text); }
         
-        .month-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; background: var(--glass); backdrop-filter: blur(10px); padding: 8px; border-radius: 50px; border: 1px solid var(--glass-border); }
-        .nav-btn { background: var(--accent); color: var(--bg); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+        .month-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; background: var(--glass); padding: 8px; border-radius: 50px; border: 1px solid var(--glass-border); }
+        .nav-btn { background: var(--accent); color: var(--bg); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -98,10 +100,22 @@
 <div class="modal-overlay" id="deleteModal">
     <div class="modal">
         <h3>למחוק את הפעולה?</h3>
-        <p>פעולה זו תמחק את הרישום לצמיתות.</p>
+        <p>הפעולה תימחק לצמיתות מהתקציב.</p>
         <div class="modal-btns">
-            <button class="modal-btn btn-confirm" id="confirmDelete">מחק</button>
-            <button class="modal-btn btn-cancel" onclick="closeModal()">ביטול</button>
+            <button onclick="confirmDeleteAction()" class="modal-btn" style="background:var(--expense); color:white;">מחק</button>
+            <button onclick="closeModal('deleteModal')" class="modal-btn" style="background:var(--glass-border); color:var(--text);">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="refreshModal">
+    <div class="modal">
+        <div style="font-size: 2.5rem; margin-bottom: 15px;">🔄</div>
+        <h3>לבדוק אם יש גרסה חדשה?</h3>
+        <p>הדף יתרענן כדי למשוך את הקוד המעודכן ביותר. הנתונים השמורים שלך <b>לא</b> יימחקו.</p>
+        <div class="modal-btns">
+            <button onclick="confirmRefreshAction()" class="modal-btn" style="background:var(--accent); color:var(--bg);">רענן עכשיו</button>
+            <button onclick="closeModal('refreshModal')" class="modal-btn" style="background:var(--glass-border); color:var(--text);">ביטול</button>
         </div>
     </div>
 </div>
@@ -136,7 +150,7 @@
 
     <div class="form-card">
         <div class="input-group">
-            <input type="text" id="desc" placeholder="תיאור...">
+            <input type="text" id="desc" placeholder="תיאור (למשל: סופר)">
             <input type="number" id="amount" placeholder="סכום">
             <select id="type">
                 <option value="income">💰 הכנסה</option>
@@ -154,15 +168,20 @@
         <button class="filter-btn" onclick="setFilter('fixed', this)">קבוע</button>
     </div>
 
-    <div class="list-container" id="list"></div>
+    <div id="list" class="list-container"></div>
 
-    <div class="actions-bottom" style="margin-top: 20px;">
-        <button class="action-btn" onclick="exportData()">💾 ייצוא</button>
-        <button class="action-btn" onclick="document.getElementById('importFile').click()">📂 ייבוא</button>
-        <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+    <div class="actions-bottom">
+        <button class="action-btn refresh" onclick="openRefreshModal()">🔄 בדוק עדכונים</button>
+        <button class="action-btn" onclick="exportJSON()">💾 גיבוי</button>
+        <button class="action-btn" onclick="exportCSV()">📊 ייצוא לאקסל</button>
+        <button class="action-btn" onclick="document.getElementById('importFile').click()">🔄 מיזוג חכם</button>
+        <input type="file" id="importFile" style="display:none" onchange="smartMerge(event)">
     </div>
 
-    <footer style="text-align:center; padding: 30px; color: var(--text-dim); font-size: 0.7rem;">© אלכסנדר זבודיסקר 2026 ©</footer>
+    <footer style="text-align:center; padding: 30px; color: var(--text-dim); font-size: 0.75rem;">
+        © אלכסנדר זבודיסקר 2026 © <br>
+        <span style="opacity:0.6; font-size: 0.65rem;">גרסה v1.2</span>
+    </footer>
 </div>
 
 <script>
@@ -172,7 +191,32 @@
     let pendingDeleteId = null;
     let currentFilter = 'all';
     let myChart = null;
-    const icons = { income: '💰', expense: '💸', fixed: '📅' };
+
+    // מודל רענון מודרני
+    function openRefreshModal() {
+        document.getElementById('refreshModal').style.display = 'flex';
+    }
+
+    function confirmRefreshAction() {
+        location.reload(true); // reload true עוקף את הקאש של הדפדפן
+    }
+
+    // פונקציות מודלים כלליות
+    function openDeleteModal(id) {
+        pendingDeleteId = id;
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+        if(modalId === 'deleteModal') pendingDeleteId = null;
+    }
+
+    function confirmDeleteAction() {
+        entries = entries.filter(e => e.id !== pendingDeleteId);
+        save();
+        closeModal('deleteModal');
+    }
 
     function showToast(msg) {
         const t = document.getElementById('toast');
@@ -180,10 +224,6 @@
         t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3000);
     }
-
-    function openDeleteModal(id) { pendingDeleteId = id; document.getElementById('deleteModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('deleteModal').style.display = 'none'; pendingDeleteId = null; }
-    document.getElementById('confirmDelete').onclick = () => { if (pendingDeleteId) { entries = entries.filter(e => e.id !== pendingDeleteId); save(); closeModal(); } };
 
     function setFilter(type, btn) {
         currentFilter = type;
@@ -196,7 +236,7 @@
         const descInput = document.getElementById('desc');
         const amountInput = document.getElementById('amount');
         const type = document.getElementById('type').value;
-        if (!descInput.value.trim() || !amountInput.value) return showToast();
+        if (!descInput.value.trim() || !amountInput.value || parseFloat(amountInput.value) <= 0) return showToast();
 
         if (editId) {
             const idx = entries.findIndex(e => e.id === editId);
@@ -244,17 +284,18 @@
         });
 
         const filteredEntries = currentFilter === 'all' ? monthEntries : monthEntries.filter(e => e.type === currentFilter);
+        const icons = { income: '💰', expense: '💸', fixed: '📅' };
 
         filteredEntries.sort((a,b) => b.id - a.id).forEach(e => {
             list.innerHTML += `
                 <div class="item ${e.type}">
-                    <div class="item-info">
-                        <div class="item-icon" style="background:none">${icons[e.type]}</div>
-                        <div class="item-desc">${e.desc}</div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span>${icons[e.type]}</span>
+                        <span>${e.desc}</span>
                     </div>
                     <div style="display:flex; align-items:center; gap:12px;">
-                        <div class="item-amount" style="color: ${e.type === 'income' ? 'var(--income)' : 'var(--text)'}">₪${e.amount.toLocaleString()}</div>
-                        <div style="opacity:0.5; display:flex; gap:8px;">
+                        <div style="font-weight:700; font-family:monospace;">₪${e.amount.toLocaleString()}</div>
+                        <div style="opacity:0.5; display:flex; gap:10px;">
                             <button onclick="editEntry(${e.id})" style="background:none; border:none; cursor:pointer;">✏️</button>
                             <button onclick="openDeleteModal(${e.id})" style="background:none; border:none; cursor:pointer;">🗑️</button>
                         </div>
@@ -286,27 +327,50 @@
                     borderWidth: 0
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '80%' }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '80%', animation: { animateRotate: true, duration: 600 } }
         });
     }
 
-    function exportData() {
+    function exportJSON() {
         const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `budget_alex_2026.json`;
+        a.download = `budget_backup_${new Date().toLocaleDateString()}.json`;
         a.click();
     }
 
-    function importData(event) {
+    function exportCSV() {
+        let csvContent = "\uFEFF תאריך,תיאור,סוג,סכום\n";
+        entries.forEach(e => {
+            const date = new Date(e.date).toLocaleDateString('he-IL');
+            const typeHeb = e.type === 'income' ? 'הכנסה' : (e.type === 'expense' ? 'הוצאה' : 'קבוע');
+            csvContent += `${date},${e.desc},${typeHeb},${e.amount}\n`;
+        });
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `תקציב_אלכסנדר_2026.csv`;
+        a.click();
+    }
+
+    function smartMerge(event) {
         const file = event.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
                 const imported = JSON.parse(e.target.result);
-                if (Array.isArray(imported)) { entries = imported; save(); alert("הנתונים יובאו!"); }
-            } catch(err) { alert("שגיאה בייבוא"); }
+                if (Array.isArray(imported)) {
+                    let n = 0, u = 0;
+                    imported.forEach(ne => {
+                        const idx = entries.findIndex(old => old.id === ne.id);
+                        if (idx !== -1) { entries[idx] = ne; u++; }
+                        else { entries.push(ne); n++; }
+                    });
+                    save();
+                    alert(`מיזוג הושלם!\nנוספו: ${n}, עודכנו: ${u}`);
+                }
+            } catch(err) { alert("שגיאה בקובץ."); }
         };
         reader.readAsText(file);
     }
