@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ניהול כספי הבית - אלקסנדר</title>
     
-    <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -31,11 +30,13 @@
         .login-card {
             background: var(--glass-bg); backdrop-filter: blur(15px); padding: 40px; border-radius: 28px;
             border: 1px solid var(--glass-border); width: 85%; max-width: 350px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
+        .login-card img { filter: drop-shadow(0 0 10px var(--accent)); margin-bottom: 20px; }
         .login-card input { 
-            width: 100%; padding: 15px; margin: 25px 0; border-radius: 12px; 
+            width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; 
             border: 1px solid var(--glass-border); background: rgba(0,0,0,0.4); 
-            color: white; text-align: center; font-size: 26px; outline: none;
+            color: white; text-align: center; font-size: 24px; outline: none;
         }
         .login-card button { 
             width: 100%; padding: 15px; background: var(--accent); color: var(--primary-bg); 
@@ -76,28 +77,20 @@
         input, select { background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; padding: 14px; border-radius: 12px; width: 100%; margin-bottom: 12px; outline: none; }
         .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; padding: 14px; border-radius: 12px; width: 100%; cursor: pointer; border: none; }
         
-        .scroll-area { max-height: 450px; overflow-y: auto; }
+        .scroll-area { max-height: 400px; overflow-y: auto; }
         .type-icon { margin-left: 10px; font-size: 1.2rem; }
         
-        #toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(120px);
-            background: rgba(239, 68, 68, 0.95); color: white; padding: 14px 28px; border-radius: 14px;
-            backdrop-filter: blur(10px); z-index: 10001; transition: 0.4s;
-        }
-        #toast.show { transform: translateX(-50%) translateY(0); }
-
         footer { text-align: center; color: var(--text-dim); font-size: 12px; padding: 40px; }
     </style>
 </head>
 <body>
 
-<div id="toast">⚠️ <span>הודעה</span></div>
-
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="color:white">כניסה</h2>
+        <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png" width="80">
+        <h2 style="color:white">כניסה למערכת</h2>
         <input type="password" id="pass-input" placeholder="סיסמה">
-        <button onclick="checkLogin()">התחבר</button>
+        <button onclick="checkLogin()">פתיחה</button>
     </div>
 </div>
 
@@ -106,15 +99,18 @@
     
     <div class="month-nav">
         <button class="nav-btn" onclick="moveMonth(-1)">◀</button>
-        <h2 id="monthTitle"></h2>
+        <h2 id="monthTitle" style="font-size: 1.1rem;"></h2>
         <button class="nav-btn" onclick="moveMonth(1)">▶</button>
     </div>
 
     <div class="grid">
         <aside>
             <div class="card">
+                <div style="text-align:center; color:var(--text-dim); font-size:0.8rem;">יתרה חודשית</div>
                 <div id="balanceVal" class="balance-val">₪ 0</div>
-                <div style="text-align:center; font-size:0.85rem;">יתרה מצטברת: <b id="totalAccumulated">₪ 0</b></div>
+                <div style="text-align:center; border-top:1px solid var(--glass-border); padding-top:10px; font-size:0.8rem;">
+                    יתרה מצטברת: <b id="totalAccumulated">₪ 0</b>
+                </div>
             </div>
 
             <div class="summary">
@@ -141,6 +137,7 @@
                 <div id="list" class="scroll-area" style="margin-top:15px;"></div>
             </div>
             <div class="card">
+                <h3>מגמה שנתית</h3>
                 <div style="height: 250px;"><canvas id="monthlyChart"></canvas></div>
             </div>
         </main>
@@ -160,11 +157,12 @@ function checkLogin() {
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("app-content").style.display = "block";
         initCharts(); render();
-    } else { alert("שגיאה בסיסמה"); }
+    } else { alert("סיסמה שגויה"); }
 }
 
 function initCharts() {
     const ctx = document.getElementById('monthlyChart').getContext('2d');
+    if(monthlyChart) monthlyChart.destroy();
     monthlyChart = new Chart(ctx, {
         type: 'bar',
         data: { labels: [], datasets: [
@@ -172,7 +170,7 @@ function initCharts() {
             { label:'הוצאה', backgroundColor:'#ef4444', data:[] },
             { label:'קבועה', backgroundColor:'#f59e0b', data:[] }
         ]},
-        options: { responsive:true, maintainAspectRatio: false }
+        options: { responsive:true, maintainAspectRatio: false, scales: { y: { stacked:true }, x: { stacked:true } } }
     });
 }
 
@@ -183,6 +181,7 @@ function addItem() {
     d.value=''; a.value=''; save();
 }
 
+function deleteItem(id) { if(confirm('למחוק?')) { data = data.filter(x=>x.id!==id); save(); } }
 function save() { localStorage.setItem('budget_db', JSON.stringify(data)); render(); }
 function moveMonth(n) { viewDate.setMonth(viewDate.getMonth()+n); render(); }
 
@@ -197,21 +196,33 @@ function render() {
     list.innerHTML = '';
     let totals = {income:0, expense:0, fixed:0};
 
-    currentData.forEach(x => {
+    currentData.sort((a,b)=>b.id-a.id).forEach(x => {
         totals[x.type] += x.amt;
         const div = document.createElement('div');
         div.className = `item ${x.type}`;
-        div.innerHTML = `<span><span class="type-icon">${icons[x.type]}</span>${x.desc}</span><b>₪${x.amt.toLocaleString()}</b>`;
+        div.innerHTML = `<span><span class="type-icon">${icons[x.type]}</span>${x.desc}</span><div style="display:flex; gap:10px;"><b>₪${x.amt.toLocaleString()}</b><button onclick="deleteItem(${x.id})" style="background:none; border:none; cursor:pointer;">🗑️</button></div>`;
         list.appendChild(div);
     });
 
-    document.getElementById('totalIncome').innerText = `₪${totals.income}`;
-    document.getElementById('totalExpense').innerText = `₪${totals.expense + totals.fixed}`;
-    document.getElementById('balanceVal').innerText = `₪${totals.income - (totals.expense + totals.fixed)}`;
-    
-    // חישוב יתרה מצטברת
+    const net = totals.income - (totals.expense + totals.fixed);
+    document.getElementById('totalIncome').innerText = `₪${totals.income.toLocaleString()}`;
+    document.getElementById('totalExpense').innerText = `₪${(totals.expense + totals.fixed).toLocaleString()}`;
+    document.getElementById('balanceVal').innerText = `₪${net.toLocaleString()}`;
+    document.getElementById('balanceVal').style.color = net >= 0 ? 'var(--income)' : 'var(--expense)';
+
+    // יתרה מצטברת
     const acc = data.reduce((sum, x) => (x.type==='income' ? sum+x.amt : sum-x.amt), 0);
     document.getElementById('totalAccumulated').innerText = `₪${acc.toLocaleString()}`;
+
+    // עדכון גרף
+    const incD=[], expD=[], fixD=[];
+    for(let i=0; i<12; i++) {
+        const mData = data.filter(x => new Date(x.date).getMonth()===i && new Date(x.date).getFullYear()===y);
+        incD.push(mData.filter(x=>x.type==='income').reduce((s,x)=>s+x.amt,0));
+        expD.push(mData.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amt,0));
+        fixD.push(mData.filter(x=>x.type==='fixed').reduce((s,x)=>s+x.amt,0));
+    }
+    if(monthlyChart) { monthlyChart.data.labels=months; monthlyChart.data.datasets[0].data=incD; monthlyChart.data.datasets[1].data=expD; monthlyChart.data.datasets[2].data=fixD; monthlyChart.update(); }
 }
 </script>
 </body>
