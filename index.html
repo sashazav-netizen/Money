@@ -39,22 +39,25 @@
         #toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: rgba(239, 68, 68, 0.9); color: white; padding: 12px 25px; border-radius: 12px;
-            backdrop-filter: blur(10px); z-index: 10000; transition: 0.4s; font-weight: 600; pointer-events: none;
+            backdrop-filter: blur(10px); z-index: 10000; transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            font-weight: 600; pointer-events: none; border: 1px solid rgba(255,255,255,0.1);
         }
         #toast.show { transform: translateX(-50%) translateY(0); }
 
         #login-screen {
             position: fixed; inset: 0; background: var(--primary-bg);
             display: flex; justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 0.5s ease;
         }
         .login-card {
             background: var(--glass-bg); backdrop-filter: blur(12px); padding: 40px; border-radius: 24px;
             text-align: center; border: 1px solid var(--glass-border); width: 85%; max-width: 340px;
         }
-        .login-card input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-size: 20px; }
-        .login-card button { width: 100%; padding: 15px; background: var(--accent); color: var(--primary-bg); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .login-card img { filter: drop-shadow(0 0 10px var(--accent)); margin-bottom: 15px; }
+        .login-card input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-size: 20px; outline: none; }
+        .login-card button { width: 100%; padding: 15px; background: var(--accent); color: var(--primary-bg); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        #app-content { display: none; padding: 15px; width: 100%; }
+        #app-content { display: none; padding: 15px; width: 100%; opacity: 0; transition: opacity 0.5s; }
         .container { max-width: 1100px; margin: 0 auto; }
 
         header { text-align: center; padding: 10px 0 25px 0; }
@@ -78,7 +81,7 @@
         .expense { border-right-color: var(--expense); }
         .fixed { border-right-color: var(--fixed); }
 
-        input, select { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; font-family: inherit; }
+        input, select { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; font-family: inherit; outline: none; }
         .btn-submit { background: var(--accent); color: var(--primary-bg); font-weight: bold; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; border: none; }
         
         .progress-bg { background: rgba(0,0,0,0.3); border-radius: 20px; height: 8px; margin: 10px 0; }
@@ -86,6 +89,9 @@
         
         .scroll-area { max-height: 400px; overflow-y: auto; }
         .type-icon { margin-left: 8px; font-size: 1.1rem; }
+        .action-btn { background: none; border: none; cursor: pointer; opacity: 0.7; transition: 0.2s; }
+        .action-btn:hover { opacity: 1; transform: scale(1.1); }
+
         footer { text-align: center; color: var(--text-dim); font-size: 11px; padding: 40px; }
     </style>
 </head>
@@ -97,6 +103,7 @@
     <div class="login-card">
         <img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png" width="70">
         <h2>כניסה למערכת</h2>
+        <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:10px;">נא להקיש סיסמה</p>
         <input type="password" id="pass-input" placeholder="סיסמה">
         <button onclick="checkLogin()">פתיחה</button>
     </div>
@@ -127,7 +134,7 @@
                 </div>
 
                 <div class="card">
-                    <h3>הוספת תנועה</h3><br>
+                    <h3 id="formTitle">הוספת תנועה</h3><br>
                     <input type="text" id="desc" placeholder="תיאור">
                     <input type="number" id="amt" placeholder="סכום">
                     <select id="type">
@@ -143,8 +150,8 @@
                     <div class="progress-bg"><div id="fixedProgress" class="progress-fill"></div></div>
                     <div style="height:150px;"><canvas id="mainChart"></canvas></div>
                     <div style="display:flex; gap:5px; margin-top:15px;">
-                        <button onclick="exportData()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; font-size:10px; padding:5px; cursor:pointer;">גיבוי</button>
-                        <button onclick="document.getElementById('fileIn').click()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; font-size:10px; padding:5px; cursor:pointer;">שחזור</button>
+                        <button onclick="exportData()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; font-size:10px; padding:5px; cursor:pointer; border-radius:5px;">גיבוי</button>
+                        <button onclick="document.getElementById('fileIn').click()" style="flex:1; background:none; border:1px solid var(--glass-border); color:white; font-size:10px; padding:5px; cursor:pointer; border-radius:5px;">שחזור</button>
                         <input type="file" id="fileIn" style="display:none" onchange="importData(event)">
                     </div>
                 </div>
@@ -171,29 +178,35 @@ let viewDate = new Date();
 let mainChart, monthlyChart;
 let editingId = null;
 
-const icons = {
-    income: '💰',
-    expense: '💸',
-    fixed: '📅'
-};
+const icons = { income: '💰', expense: '💸', fixed: '📅' };
 
-function showToast(msg) {
+function showToast(msg, isError = true) {
     const t = document.getElementById('toast');
     t.querySelector('span').innerText = msg;
+    t.style.background = isError ? 'rgba(239, 68, 68, 0.9)' : 'rgba(34, 197, 94, 0.9)';
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 function checkLogin() {
     if (document.getElementById("pass-input").value === "0000") {
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("app-content").style.display = "block";
-        initCharts(); render();
-    } else { alert("סיסמה שגויה"); }
+        const ls = document.getElementById("login-screen");
+        const ac = document.getElementById("app-content");
+        ls.style.opacity = "0";
+        setTimeout(() => {
+            ls.style.display = "none";
+            ac.style.display = "block";
+            setTimeout(() => ac.style.opacity = "1", 50);
+            initCharts(); render();
+        }, 500);
+    } else { showToast("סיסמה שגויה"); }
 }
+
+document.getElementById('pass-input').addEventListener('keypress', (e) => { if(e.key==='Enter') checkLogin(); });
 
 function initCharts() {
     const ctx1 = document.getElementById('mainChart').getContext('2d');
+    if(mainChart) mainChart.destroy();
     mainChart = new Chart(ctx1, {
         type: 'doughnut',
         data: { labels: ['הכנסה', 'הוצאה', 'קבועה'], datasets: [{ data: [0,0,0], backgroundColor: ['#22c55e','#ef4444','#f59e0b'], borderWidth: 0 }] },
@@ -201,6 +214,7 @@ function initCharts() {
     });
 
     const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+    if(monthlyChart) monthlyChart.destroy();
     monthlyChart = new Chart(ctx2, {
         type: 'bar',
         data: { labels: [], datasets: [
@@ -214,22 +228,41 @@ function initCharts() {
 
 function addItem() {
     const d = document.getElementById('desc'), a = document.getElementById('amt'), t = document.getElementById('type');
-    if (!d.value || !a.value) { showToast("מלא את כל השדות"); return; }
+    if (!d.value.trim() || !a.value || parseFloat(a.value) <= 0) {
+        showToast("חובה למלא תיאור וסכום תקין");
+        return;
+    }
     if(editingId){
         const i = data.find(x=>x.id===editingId);
         i.desc=d.value; i.amt=parseFloat(a.value); i.type=t.value;
-        editingId=null; document.getElementById('submitBtn').innerText="בצע";
+        editingId=null; 
+        document.getElementById('submitBtn').innerText="בצע";
+        document.getElementById('formTitle').innerText="הוספת תנועה";
+        showToast("התנועה עודכנה", false);
     } else {
         data.push({ id: Date.now(), desc: d.value, amt: parseFloat(a.value), type: t.value, date: viewDate.toISOString() });
+        showToast("התנועה נוספה", false);
     }
     d.value=''; a.value=''; save();
 }
 
-function deleteItem(id) { if(confirm('למחוק?')) { data = data.filter(x=>x.id!==id); save(); } }
+function deleteItem(id) { 
+    if(confirm('למחוק את התנועה?')) { 
+        data = data.filter(x=>x.id!==id); 
+        save(); 
+        showToast("התנועה נמחקה", false);
+    } 
+}
+
 function editItem(id) {
     const i = data.find(x=>x.id===id);
-    document.getElementById('desc').value=i.desc; document.getElementById('amt').value=i.amt; document.getElementById('type').value=i.type;
-    editingId=id; document.getElementById('submitBtn').innerText="עדכן";
+    document.getElementById('desc').value=i.desc; 
+    document.getElementById('amt').value=i.amt; 
+    document.getElementById('type').value=i.type;
+    editingId=id; 
+    document.getElementById('submitBtn').innerText="עדכן";
+    document.getElementById('formTitle').innerText="עריכת תנועה";
+    window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 function moveMonth(n) { viewDate.setMonth(viewDate.getMonth()+n); render(); }
@@ -250,7 +283,13 @@ function render() {
         totals[x.type] += x.amt;
         const div = document.createElement('div');
         div.className = `item ${x.type}`;
-        div.innerHTML = `<span><span class="type-icon">${icons[x.type] || ''}</span>${x.desc}</span><div style="display:flex; gap:15px; align-items:center;"><b>₪${x.amt.toLocaleString()}</b><button onclick="editItem(${x.id})" style="background:none; border:none; cursor:pointer;">✏️</button><button onclick="deleteItem(${x.id})" style="background:none; border:none; cursor:pointer;">🗑️</button></div>`;
+        div.innerHTML = `
+            <span><span class="type-icon">${icons[x.type] || ''}</span>${x.desc}</span>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <b>₪${x.amt.toLocaleString()}</b>
+                <button class="action-btn" onclick="editItem(${x.id})">✏️</button>
+                <button class="action-btn" onclick="deleteItem(${x.id})">🗑️</button>
+            </div>`;
         list.appendChild(div);
     });
 
@@ -284,11 +323,18 @@ function render() {
 function exportData(){
     const a=document.createElement('a');
     a.href=URL.createObjectURL(new Blob([JSON.stringify(data)], {type:"application/json"}));
-    a.download="budget_backup.json"; a.click();
+    a.download=`budget_backup_${new Date().toLocaleDateString()}.json`; a.click();
+    showToast("הגיבוי הושלם", false);
 }
 function importData(e){
     const r=new FileReader();
-    r.onload=(ev)=>{ try{ data=JSON.parse(ev.target.result); save(); } catch(e){ alert('קובץ לא תקין'); } };
+    r.onload=(ev)=>{ 
+        try{ 
+            data=JSON.parse(ev.target.result); 
+            save(); 
+            showToast("הנתונים שוחזרו בהצלחה", false);
+        } catch(err){ showToast('קובץ לא תקין'); } 
+    };
     r.readAsText(e.target.files[0]);
 }
 
