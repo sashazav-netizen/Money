@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>ניהול תקציב ביתי - אלכסנדר 2026</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js?v=1710920000"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js?v=2026_final"></script>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -27,89 +25,40 @@
 
         html, body { max-width: 100%; overflow-x: hidden; margin: 0; padding: 0; background: var(--bg); }
         * { box-sizing: border-box; font-family: 'Heebo', sans-serif; }
-        
-        body { 
-            background: radial-gradient(circle at top right, #1e293b, #070b14);
-            background-attachment: fixed;
-            color: var(--text); padding: 15px; direction: rtl; min-height: 100vh;
-        }
-
+        body { background: radial-gradient(circle at top right, #1e293b, #070b14); background-attachment: fixed; color: var(--text); padding: 15px; direction: rtl; min-height: 100vh; }
         .container { max-width: 600px; margin: 0 auto; }
-
         header { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 20px 0 25px 0; }
         .header-icon { width: 42px; height: 42px; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5)); }
         .coin-svg { fill: #f59e0b; animation: coinSpin 4s infinite linear; }
         @keyframes coinSpin { 0%, 100% { transform: rotateY(0deg); } 50% { transform: rotateY(180deg); } }
-
-        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text); margin: 0; }
+        h1 { font-size: 1.8rem; font-weight: 900; margin: 0; }
         h1 span { color: var(--accent); }
-
         .month-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; background: var(--glass); padding: 8px; border-radius: 50px; border: 1px solid var(--glass-border); }
         .nav-btn { background: var(--accent); color: var(--bg); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-
         .summary-mini { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
         .mini-card { background: var(--glass); backdrop-filter: blur(12px); padding: 12px 2px; border-radius: 14px; text-align: center; border: 1px solid var(--glass-border); }
         .mini-card span { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
-        .mini-card b { font-size: 0.9rem; white-space: nowrap; }
-        .mini-card.highlight { border: 1px solid var(--balance); background: rgba(56, 189, 248, 0.1); }
-
-        .chart-section { 
-            background: var(--glass); 
-            backdrop-filter: blur(12px); 
-            padding: 20px; 
-            border-radius: 20px; 
-            margin: 0 auto 25px auto; 
-            border: 1px solid var(--glass-border); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            max-width: 250px;
-        }
+        .mini-card b { font-size: 0.9rem; }
+        .chart-section { background: var(--glass); backdrop-filter: blur(12px); padding: 20px; border-radius: 20px; margin: 0 auto 25px auto; border: 1px solid var(--glass-border); display: flex; justify-content: center; align-items: center; max-width: 250px; }
         .chart-container { height: 120px; width: 120px; position: relative; }
-
         .form-card { background: var(--glass); backdrop-filter: blur(12px); padding: 15px; border-radius: 18px; margin-bottom: 25px; border: 1px solid var(--glass-border); }
         .input-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        input, select, .btn-main { padding: 10px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.6); color: white; outline: none; font-size: 0.9rem; }
-        input { flex: 2; min-width: 120px; }
+        input, select, .btn-main { padding: 10px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.6); color: white; outline: none; }
         .btn-main { background: var(--accent); color: var(--bg); font-weight: 900; cursor: pointer; border: none; flex: 1; }
-
-        .filter-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
-        .filter-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
-        .filter-btn.active { background: var(--accent); color: var(--bg); font-weight: 700; }
-
         .item { background: var(--glass); margin-bottom: 8px; display: flex; justify-content: space-between; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--glass-border); align-items: center; }
         .item.income { border-right: 4px solid var(--income); }
         .item.expense { border-right: 4px solid var(--expense); }
         .item.fixed { border-right: 4px solid var(--fixed); }
-
         .actions-bottom { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 20px 0; }
         .action-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10001; }
-        .modal { background: #1e293b; border: 1px solid var(--glass-border); padding: 25px; border-radius: 24px; width: 90%; max-width: 320px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="modal-overlay" id="refreshModal">
-    <div class="modal">
-        <div style="font-size: 2.5rem; margin-bottom: 10px;">🔄</div>
-        <h3>ניקוי זיכרון עמוק</h3>
-        <p style="color:var(--text-dim)">האם לבצע רענון מלא של האתר כדי לעקוף גרסאות ישנות?</p>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button onclick="forceHardRefresh()" style="flex:1; padding:12px; border-radius:10px; background:var(--accent); color:var(--bg); border:none; cursor:pointer; font-weight:700;">רענן עכשיו</button>
-            <button onclick="closeModal('refreshModal')" style="flex:1; padding:12px; border-radius:10px; background:var(--glass-border); color:var(--text); border:none; cursor:pointer;">ביטול</button>
-        </div>
-    </div>
-</div>
-
 <div class="container">
     <header>
         <div class="header-icon">
-            <svg viewBox="0 0 24 24" class="coin-svg" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
-                <path d="M12 7v10M9 9h6M9 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+            <svg viewBox="0 0 24 24" class="coin-svg" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M9 9h6M9 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </div>
         <h1>ניהול תקציב <span>ביתי</span></h1>
     </header>
@@ -124,12 +73,10 @@
         <div class="mini-card"><span>הכנסות</span><b id="sumIncome" style="color:var(--income)">₪0</b></div>
         <div class="mini-card"><span>הוצאות</span><b id="sumExpense" style="color:var(--expense)">₪0</b></div>
         <div class="mini-card"><span>קבוע</span><b id="sumFixed" style="color:var(--fixed)">₪0</b></div>
-        <div class="mini-card highlight"><span>יתרה</span><b id="sumBalance" style="color:var(--balance)">₪0</b></div>
+        <div class="mini-card"><span>יתרה</span><b id="sumBalance" style="color:var(--balance)">₪0</b></div>
     </div>
 
-    <div class="chart-section">
-        <div class="chart-container"><canvas id="budgetChart"></canvas></div>
-    </div>
+    <div class="chart-section"><div class="chart-container"><canvas id="budgetChart"></canvas></div></div>
 
     <div class="form-card">
         <div class="input-group">
@@ -144,49 +91,29 @@
         </div>
     </div>
 
-    <div class="filter-bar">
-        <button class="filter-btn active" onclick="setFilter('all', this)">הכל</button>
-        <button class="filter-btn" onclick="setFilter('income', this)">הכנסות</button>
-        <button class="filter-btn" onclick="setFilter('expense', this)">הוצאות</button>
-    </div>
-
     <div id="list"></div>
 
     <div class="actions-bottom">
-        <button class="action-btn" style="color:var(--accent)" onclick="openModal('refreshModal')">🔄 תקוע על ישן?</button>
+        <button class="action-btn" onclick="location.reload(true)">🔄 רענן דף</button>
         <button class="action-btn" onclick="exportJSON()">💾 גיבוי</button>
-        <button class="action-btn" onclick="exportCSV()">📊 אקסל</button>
         <button class="action-btn" onclick="document.getElementById('importFile').click()">🔄 מיזוג חכם</button>
         <input type="file" id="importFile" style="display:none" onchange="smartMerge(event)">
     </div>
 
     <footer style="text-align:center; padding: 20px; color: var(--text-dim); font-size: 0.7rem;">
-        © אלכסנדר זבודיסקר 2026 © v1.2.5
+        © אלכסנדר זבודיסקר 2026 © v1.2.6
     </footer>
 </div>
 
 <script>
+    // הגנת קאש - אם נטען בלי גרסה, נרענן פעם אחת עם גרסה
+    if (!window.location.search.includes('v=')) {
+        window.location.replace(window.location.pathname + '?v=' + Date.now());
+    }
+
     let entries = JSON.parse(localStorage.getItem('budget_alex_2026')) || [];
     let viewDate = new Date();
-    let currentFilter = 'all';
     let myChart = null;
-
-    // פונקציית רענון כפוי שעוקפת קאש של דפדפן ושרת
-    function forceHardRefresh() {
-        const url = new URL(window.location.href);
-        url.searchParams.set('reload_ts', Date.now());
-        window.location.replace(url.toString());
-    }
-
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-    function setFilter(type, btn) {
-        currentFilter = type;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        render();
-    }
 
     function save() { localStorage.setItem('budget_alex_2026', JSON.stringify(entries)); render(); }
     function changeMonth(n) { viewDate.setMonth(viewDate.getMonth() + n); render(); }
@@ -202,52 +129,26 @@
         const mNames = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
         const m = viewDate.getMonth(), y = viewDate.getFullYear();
         document.getElementById('monthLabel').innerText = `${mNames[m]} ${y}`;
-
-        const monthEntries = entries.filter(e => {
-            const d = new Date(e.date);
-            return d.getMonth() === m && d.getFullYear() === y;
-        });
-
+        const monthEntries = entries.filter(e => { const d = new Date(e.date); return d.getMonth() === m && d.getFullYear() === y; });
         let inc = 0, exp = 0, fix = 0;
         const list = document.getElementById('list'); list.innerHTML = '';
-        
         monthEntries.forEach(e => {
             if(e.type==='income') inc+=e.amount; else if(e.type==='expense') exp+=e.amount; else fix+=e.amount;
+            list.innerHTML += `<div class="item ${e.type}"><span>${e.desc}</span><b>₪${e.amount.toLocaleString()}</b></div>`;
         });
-
-        const filtered = currentFilter === 'all' ? monthEntries : monthEntries.filter(x => x.type === currentFilter);
-        const icons = {income:'💰', expense:'💸', fixed:'📅'};
-
-        filtered.sort((a,b) => b.id - a.id).forEach(e => {
-            list.innerHTML += `<div class="item ${e.type}"><span>${icons[e.type]} ${e.desc}</span><b>₪${e.amount.toLocaleString()}</b></div>`;
-        });
-
         document.getElementById('sumIncome').innerText = `₪${inc.toLocaleString()}`;
         document.getElementById('sumExpense').innerText = `₪${exp.toLocaleString()}`;
         document.getElementById('sumFixed').innerText = `₪${fix.toLocaleString()}`;
         const bal = inc - (exp + fix);
         document.getElementById('sumBalance').innerText = `₪${bal.toLocaleString()}`;
-        document.getElementById('sumBalance').style.color = bal >= 0 ? 'var(--balance)' : 'var(--expense)';
-
         const ctx = document.getElementById('budgetChart').getContext('2d');
         if(myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { datasets: [{ data: (inc||exp||fix) ? [inc, exp, fix] : [1], backgroundColor: (inc||exp||fix) ? ['#22c55e', '#ef4444', '#f59e0b'] : ['#1e293b'], borderWidth: 0 }] },
-            options: { cutout: '75%', plugins: { legend: { display: false } }, animation: { duration: 800 } }
-        });
+        myChart = new Chart(ctx, { type: 'doughnut', data: { datasets: [{ data: (inc||exp||fix) ? [inc, exp, fix] : [1], backgroundColor: (inc||exp||fix) ? ['#22c55e', '#ef4444', '#f59e0b'] : ['#1e293b'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { display: false } } } });
     }
 
     function exportJSON() {
         const blob = new Blob([JSON.stringify(entries)], {type:'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'budget_backup.json'; a.click();
-    }
-
-    function exportCSV() {
-        let csv = "\uFEFFתאריך,תיאור,סכום\n";
-        entries.forEach(e => csv += `${new Date(e.date).toLocaleDateString()},${e.desc},${e.amount}\n`);
-        const blob = new Blob([csv], {type:'text/csv'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'budget.csv'; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'budget_bak.json'; a.click();
     }
 
     function smartMerge(ev) {
@@ -255,11 +156,10 @@
         reader.onload = (e) => {
             const data = JSON.parse(e.target.result);
             data.forEach(ne => { if(!entries.find(old => old.id === ne.id)) entries.push(ne); });
-            save(); alert("המיזוג הושלם!");
+            save(); alert("מוזג!");
         };
         reader.readAsText(ev.target.files[0]);
     }
-
     render();
 </script>
 </body>
