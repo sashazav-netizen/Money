@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>ניהול תקציב ביתי - אלכסנדר 2026</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js?v=2026_4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js?v=1710920000"></script>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -93,10 +94,10 @@
 <div class="modal-overlay" id="refreshModal">
     <div class="modal">
         <div style="font-size: 2.5rem; margin-bottom: 10px;">🔄</div>
-        <h3>גרסה חדשה?</h3>
-        <p style="color:var(--text-dim)">הדף יתרענן באופן עמוק כדי לעקוף את זיכרון המטמון.</p>
+        <h3>ניקוי זיכרון עמוק</h3>
+        <p style="color:var(--text-dim)">האם לבצע רענון מלא של האתר כדי לעקוף גרסאות ישנות?</p>
         <div style="display:flex; gap:10px; margin-top:20px;">
-            <button onclick="confirmRefreshAction()" style="flex:1; padding:12px; border-radius:10px; background:var(--accent); color:var(--bg); border:none; cursor:pointer; font-weight:700;">בצע רענון</button>
+            <button onclick="forceHardRefresh()" style="flex:1; padding:12px; border-radius:10px; background:var(--accent); color:var(--bg); border:none; cursor:pointer; font-weight:700;">רענן עכשיו</button>
             <button onclick="closeModal('refreshModal')" style="flex:1; padding:12px; border-radius:10px; background:var(--glass-border); color:var(--text); border:none; cursor:pointer;">ביטול</button>
         </div>
     </div>
@@ -152,7 +153,7 @@
     <div id="list"></div>
 
     <div class="actions-bottom">
-        <button class="action-btn" style="color:var(--accent)" onclick="openRefreshModal()">🔄 תקוע על ישן?</button>
+        <button class="action-btn" style="color:var(--accent)" onclick="openModal('refreshModal')">🔄 תקוע על ישן?</button>
         <button class="action-btn" onclick="exportJSON()">💾 גיבוי</button>
         <button class="action-btn" onclick="exportCSV()">📊 אקסל</button>
         <button class="action-btn" onclick="document.getElementById('importFile').click()">🔄 מיזוג חכם</button>
@@ -160,7 +161,7 @@
     </div>
 
     <footer style="text-align:center; padding: 20px; color: var(--text-dim); font-size: 0.7rem;">
-        © אלכסנדר זבודיסקר 2026 © v1.2.4
+        © אלכסנדר זבודיסקר 2026 © v1.2.5
     </footer>
 </div>
 
@@ -170,9 +171,15 @@
     let currentFilter = 'all';
     let myChart = null;
 
-    function openRefreshModal() { document.getElementById('refreshModal').style.display = 'flex'; }
+    // פונקציית רענון כפוי שעוקפת קאש של דפדפן ושרת
+    function forceHardRefresh() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('reload_ts', Date.now());
+        window.location.replace(url.toString());
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function confirmRefreshAction() { window.location.replace(window.location.pathname + '?v=' + Date.now()); }
 
     function setFilter(type, btn) {
         currentFilter = type;
@@ -212,21 +219,22 @@
         const icons = {income:'💰', expense:'💸', fixed:'📅'};
 
         filtered.sort((a,b) => b.id - a.id).forEach(e => {
-            list.innerHTML += `<div class="item ${e.type}"><span>${icons[e.type]} ${e.desc}</span><b>₪${e.amount}</b></div>`;
+            list.innerHTML += `<div class="item ${e.type}"><span>${icons[e.type]} ${e.desc}</span><b>₪${e.amount.toLocaleString()}</b></div>`;
         });
 
-        document.getElementById('sumIncome').innerText = `₪${inc}`;
-        document.getElementById('sumExpense').innerText = `₪${exp}`;
-        document.getElementById('sumFixed').innerText = `₪${fix}`;
+        document.getElementById('sumIncome').innerText = `₪${inc.toLocaleString()}`;
+        document.getElementById('sumExpense').innerText = `₪${exp.toLocaleString()}`;
+        document.getElementById('sumFixed').innerText = `₪${fix.toLocaleString()}`;
         const bal = inc - (exp + fix);
-        document.getElementById('sumBalance').innerText = `₪${bal}`;
+        document.getElementById('sumBalance').innerText = `₪${bal.toLocaleString()}`;
+        document.getElementById('sumBalance').style.color = bal >= 0 ? 'var(--balance)' : 'var(--expense)';
 
         const ctx = document.getElementById('budgetChart').getContext('2d');
         if(myChart) myChart.destroy();
         myChart = new Chart(ctx, {
             type: 'doughnut',
             data: { datasets: [{ data: (inc||exp||fix) ? [inc, exp, fix] : [1], backgroundColor: (inc||exp||fix) ? ['#22c55e', '#ef4444', '#f59e0b'] : ['#1e293b'], borderWidth: 0 }] },
-            options: { cutout: '75%', plugins: { legend: { display: false } } }
+            options: { cutout: '75%', plugins: { legend: { display: false } }, animation: { duration: 800 } }
         });
     }
 
@@ -247,7 +255,7 @@
         reader.onload = (e) => {
             const data = JSON.parse(e.target.result);
             data.forEach(ne => { if(!entries.find(old => old.id === ne.id)) entries.push(ne); });
-            save(); alert("המיזוג הושלם בהצלחה!");
+            save(); alert("המיזוג הושלם!");
         };
         reader.readAsText(ev.target.files[0]);
     }
