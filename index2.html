@@ -21,7 +21,7 @@
             --accent: #38bdf8;
         }
 
-        html, body { max-width: 100%; overflow-x: hidden; margin: 0; padding: 0; }
+        html, body { max-width: 100%; overflow-x: hidden; margin: 0; padding: 0; background: var(--bg); }
         * { box-sizing: border-box; font-family: 'Heebo', sans-serif; }
         
         body { 
@@ -30,7 +30,7 @@
             color: var(--text); padding: 15px; direction: rtl; min-height: 100vh;
         }
 
-        .container { max-width: 600px; margin: auto; }
+        .container { max-width: 600px; margin: 0 auto; }
 
         header { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 20px 0 25px 0; }
         .header-icon { width: 42px; height: 42px; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5)); }
@@ -40,82 +40,78 @@
         h1 { font-size: 1.8rem; font-weight: 900; color: var(--text); margin: 0; }
         h1 span { color: var(--accent); }
 
+        .month-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; background: var(--glass); padding: 8px; border-radius: 50px; border: 1px solid var(--glass-border); }
+        .nav-btn { background: var(--accent); color: var(--bg); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+
         .summary-mini { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
-        .mini-card { background: var(--glass); backdrop-filter: blur(12px); padding: 12px 2px; border-radius: 14px; text-align: center; border: 1px solid var(--glass-border); transition: 0.3s; }
+        .mini-card { background: var(--glass); backdrop-filter: blur(12px); padding: 12px 2px; border-radius: 14px; text-align: center; border: 1px solid var(--glass-border); }
         .mini-card span { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
         .mini-card b { font-size: 0.9rem; white-space: nowrap; }
-        .mini-card.highlight { border: 1px solid var(--balance); background: rgba(56, 189, 248, 0.1); transform: scale(1.05); }
+        .mini-card.highlight { border: 1px solid var(--balance); background: rgba(56, 189, 248, 0.1); }
 
-        .chart-section { background: var(--glass); backdrop-filter: blur(12px); padding: 15px; border-radius: 20px; margin-bottom: 25px; border: 1px solid var(--glass-border); display: flex; justify-content: center; }
-        .chart-container { height: 90px; width: 140px; }
-
-        .filter-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
-        .filter-btn { 
-            background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); 
-            padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; transition: 0.3s;
+        /* מרכוז הגרף */
+        .chart-section { 
+            background: var(--glass); 
+            backdrop-filter: blur(12px); 
+            padding: 20px; 
+            border-radius: 20px; 
+            margin: 0 auto 25px auto; 
+            border: 1px solid var(--glass-border); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            max-width: 250px; /* צמצום הרוחב של הקופסה כדי שתהיה ממורכזת */
         }
-        .filter-btn.active { background: var(--accent); color: var(--bg); font-weight: 700; border-color: var(--accent); }
+        .chart-container { height: 120px; width: 120px; position: relative; }
 
         .form-card { background: var(--glass); backdrop-filter: blur(12px); padding: 15px; border-radius: 18px; margin-bottom: 25px; border: 1px solid var(--glass-border); }
         .input-group { display: flex; gap: 8px; flex-wrap: wrap; }
         input, select, .btn-main { padding: 10px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.6); color: white; outline: none; font-size: 0.9rem; }
         input { flex: 2; min-width: 120px; }
-        select { flex: 1; min-width: 100px; cursor: pointer; }
-        .btn-main { background: var(--accent); color: var(--bg); font-weight: 900; cursor: pointer; border: none; flex: 1; transition: 0.2s; }
+        .btn-main { background: var(--accent); color: var(--bg); font-weight: 900; cursor: pointer; border: none; flex: 1; }
 
-        .list-container { border-radius: 18px; margin-bottom: 30px; }
-        .item { 
-            background: var(--glass); backdrop-filter: blur(8px); margin-bottom: 8px; 
-            display: flex; justify-content: space-between; padding: 12px 15px; 
-            border-radius: 12px; border: 1px solid var(--glass-border); align-items: center;
-        }
+        .filter-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
+        .filter-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+        .filter-btn.active { background: var(--accent); color: var(--bg); font-weight: 700; }
+
+        .item { background: var(--glass); margin-bottom: 8px; display: flex; justify-content: space-between; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--glass-border); align-items: center; }
         .item.income { border-right: 4px solid var(--income); }
         .item.expense { border-right: 4px solid var(--expense); }
         .item.fixed { border-right: 4px solid var(--fixed); }
 
         .actions-bottom { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding-bottom: 20px; }
-        .action-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
-        .action-btn.refresh { background: rgba(56, 189, 248, 0.15); color: var(--accent); border-color: var(--accent); }
+        .action-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; }
 
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150px); background: var(--expense); color: white; padding: 12px 25px; border-radius: 12px; z-index: 10000; transition: 0.5s; opacity: 0; font-weight: 700; }
-        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: var(--expense); color: white; padding: 12px 25px; border-radius: 12px; z-index: 10000; transition: 0.5s; opacity: 0; font-weight: 700; pointer-events: none; }
+        #toast.show { top: 20px; opacity: 1; }
 
-        /* מודלים בעיצוב Glassmorphism */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 10001; }
-        .modal { background: var(--glass); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes modalIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal h3 { margin-bottom: 10px; font-size: 1.3rem; }
-        .modal p { color: var(--text-dim); margin-bottom: 20px; font-size: 0.95rem; }
-        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .modal-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; }
-        
-        .month-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; background: var(--glass); padding: 8px; border-radius: 50px; border: 1px solid var(--glass-border); }
-        .nav-btn { background: var(--accent); color: var(--bg); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10001; }
+        .modal { background: #1e293b; border: 1px solid var(--glass-border); padding: 25px; border-radius: 24px; width: 90%; max-width: 320px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="toast">⚠️ נא למלא תיאור וסכום תקין!</div>
+<div id="toast">⚠️ פרטים חסרים</div>
 
 <div class="modal-overlay" id="deleteModal">
     <div class="modal">
         <h3>למחוק את הפעולה?</h3>
-        <p>הפעולה תימחק לצמיתות מהתקציב.</p>
-        <div class="modal-btns">
-            <button onclick="confirmDeleteAction()" class="modal-btn" style="background:var(--expense); color:white;">מחק</button>
-            <button onclick="closeModal('deleteModal')" class="modal-btn" style="background:var(--glass-border); color:var(--text);">ביטול</button>
+        <p style="color:var(--text-dim)">הפעולה תימחק לצמיתות.</p>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button onclick="confirmDeleteAction()" style="flex:1; padding:12px; border-radius:10px; background:var(--expense); color:white; border:none; cursor:pointer; font-weight:700;">מחק</button>
+            <button onclick="closeModal('deleteModal')" style="flex:1; padding:12px; border-radius:10px; background:var(--glass-border); color:var(--text); border:none; cursor:pointer;">ביטול</button>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="refreshModal">
     <div class="modal">
-        <div style="font-size: 2.5rem; margin-bottom: 15px;">🔄</div>
-        <h3>לבדוק אם יש גרסה חדשה?</h3>
-        <p>הדף יתרענן כדי למשוך את הקוד המעודכן ביותר. הנתונים השמורים שלך <b>לא</b> יימחקו.</p>
-        <div class="modal-btns">
-            <button onclick="confirmRefreshAction()" class="modal-btn" style="background:var(--accent); color:var(--bg);">רענן עכשיו</button>
-            <button onclick="closeModal('refreshModal')" class="modal-btn" style="background:var(--glass-border); color:var(--text);">ביטול</button>
+        <div style="font-size: 2.5rem; margin-bottom: 10px;">🔄</div>
+        <h3>גרסה חדשה?</h3>
+        <p style="color:var(--text-dim)">הדף יתרענן. הנתונים לא יימחקו.</p>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button onclick="confirmRefreshAction()" style="flex:1; padding:12px; border-radius:10px; background:var(--accent); color:var(--bg); border:none; cursor:pointer; font-weight:700;">רענן</button>
+            <button onclick="closeModal('refreshModal')" style="flex:1; padding:12px; border-radius:10px; background:var(--glass-border); color:var(--text); border:none; cursor:pointer;">ביטול</button>
         </div>
     </div>
 </div>
@@ -133,15 +129,15 @@
 
     <div class="month-nav">
         <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
-        <h3 id="monthLabel" style="margin:0; font-size: 1.1rem;"></h3>
+        <h3 id="monthLabel" style="margin:0;"></h3>
         <button class="nav-btn" onclick="changeMonth(1)">▶</button>
     </div>
 
     <div class="summary-mini">
-        <div class="mini-card"><span>הכנסות</span><b id="sumIncome" style="color: var(--income)">₪0</b></div>
-        <div class="mini-card"><span>הוצאות</span><b id="sumExpense" style="color: var(--expense)">₪0</b></div>
-        <div class="mini-card"><span>קבוע</span><b id="sumFixed" style="color: var(--fixed)">₪0</b></div>
-        <div class="mini-card highlight"><span>יתרה</span><b id="sumBalance" style="color: var(--balance)">₪0</b></div>
+        <div class="mini-card"><span>הכנסות</span><b id="sumIncome" style="color:var(--income)">₪0</b></div>
+        <div class="mini-card"><span>הוצאות</span><b id="sumExpense" style="color:var(--expense)">₪0</b></div>
+        <div class="mini-card"><span>קבוע</span><b id="sumFixed" style="color:var(--fixed)">₪0</b></div>
+        <div class="mini-card highlight"><span>יתרה</span><b id="sumBalance" style="color:var(--balance)">₪0</b></div>
     </div>
 
     <div class="chart-section">
@@ -150,7 +146,7 @@
 
     <div class="form-card">
         <div class="input-group">
-            <input type="text" id="desc" placeholder="תיאור (למשל: סופר)">
+            <input type="text" id="desc" placeholder="תיאור">
             <input type="number" id="amount" placeholder="סכום">
             <select id="type">
                 <option value="income">💰 הכנסה</option>
@@ -165,22 +161,20 @@
         <button class="filter-btn active" onclick="setFilter('all', this)">הכל</button>
         <button class="filter-btn" onclick="setFilter('income', this)">הכנסות</button>
         <button class="filter-btn" onclick="setFilter('expense', this)">הוצאות</button>
-        <button class="filter-btn" onclick="setFilter('fixed', this)">קבוע</button>
     </div>
 
-    <div id="list" class="list-container"></div>
+    <div id="list"></div>
 
     <div class="actions-bottom">
-        <button class="action-btn refresh" onclick="openRefreshModal()">🔄 בדוק עדכונים</button>
+        <button class="action-btn" style="color:var(--accent)" onclick="openRefreshModal()">🔄 עדכון גרסה</button>
         <button class="action-btn" onclick="exportJSON()">💾 גיבוי</button>
-        <button class="action-btn" onclick="exportCSV()">📊 ייצוא לאקסל</button>
-        <button class="action-btn" onclick="document.getElementById('importFile').click()">🔄 מיזוג חכם</button>
+        <button class="action-btn" onclick="exportCSV()">📊 אקסל</button>
+        <button class="action-btn" onclick="document.getElementById('importFile').click()">🔄 מיזוג</button>
         <input type="file" id="importFile" style="display:none" onchange="smartMerge(event)">
     </div>
 
-    <footer style="text-align:center; padding: 30px; color: var(--text-dim); font-size: 0.75rem;">
-        © אלכסנדר זבודיסקר 2026 © <br>
-        <span style="opacity:0.6; font-size: 0.65rem;">גרסה v1.2</span>
+    <footer style="text-align:center; padding: 20px; color: var(--text-dim); font-size: 0.7rem;">
+        © אלכסנדר זבודיסקר 2026 © v1.2.2
     </footer>
 </div>
 
@@ -192,113 +186,75 @@
     let currentFilter = 'all';
     let myChart = null;
 
-    // מודל רענון מודרני
-    function openRefreshModal() {
-        document.getElementById('refreshModal').style.display = 'flex';
-    }
-
-    function confirmRefreshAction() {
-        location.reload(true); // reload true עוקף את הקאש של הדפדפן
-    }
-
-    // פונקציות מודלים כלליות
-    function openDeleteModal(id) {
-        pendingDeleteId = id;
-        document.getElementById('deleteModal').style.display = 'flex';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-        if(modalId === 'deleteModal') pendingDeleteId = null;
-    }
-
-    function confirmDeleteAction() {
-        entries = entries.filter(e => e.id !== pendingDeleteId);
-        save();
-        closeModal('deleteModal');
-    }
+    function openRefreshModal() { document.getElementById('refreshModal').style.display = 'flex'; }
+    function confirmRefreshAction() { location.reload(true); }
+    function openDeleteModal(id) { pendingDeleteId = id; document.getElementById('deleteModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function confirmDeleteAction() { entries = entries.filter(e => e.id !== pendingDeleteId); save(); closeModal('deleteModal'); }
 
     function showToast(msg) {
         const t = document.getElementById('toast');
-        if(msg) t.innerText = msg;
-        t.classList.add('show');
+        t.innerText = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    function setFilter(type, btn) {
-        currentFilter = type;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        render();
-    }
-
-    function addEntry() {
-        const descInput = document.getElementById('desc');
-        const amountInput = document.getElementById('amount');
-        const type = document.getElementById('type').value;
-        if (!descInput.value.trim() || !amountInput.value || parseFloat(amountInput.value) <= 0) return showToast();
-
-        if (editId) {
-            const idx = entries.findIndex(e => e.id === editId);
-            entries[idx] = { ...entries[idx], desc: descInput.value, amount: parseFloat(amountInput.value), type: type };
-            editId = null;
-            document.getElementById('saveBtn').innerText = "שמור";
-        } else {
-            entries.push({ id: Date.now(), desc: descInput.value, amount: parseFloat(amountInput.value), type, date: new Date(viewDate.getFullYear(), viewDate.getMonth(), 15).toISOString() });
-        }
-        descInput.value = ''; amountInput.value = '';
-        save();
-    }
-
-    function editEntry(id) {
-        const item = entries.find(e => e.id === id);
-        document.getElementById('desc').value = item.desc;
-        document.getElementById('amount').value = item.amount;
-        document.getElementById('type').value = item.type;
-        editId = id;
-        document.getElementById('saveBtn').innerText = "עדכן";
-        window.scrollTo({ top: 150, behavior: 'smooth' });
     }
 
     function save() { localStorage.setItem('budget_alex_2026', JSON.stringify(entries)); render(); }
     function changeMonth(n) { viewDate.setMonth(viewDate.getMonth() + n); render(); }
+    function setFilter(type, btn) { 
+        currentFilter = type; 
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active'); render(); 
+    }
+
+    function addEntry() {
+        const d = document.getElementById('desc'), a = document.getElementById('amount'), t = document.getElementById('type');
+        if(!d.value || !a.value) return showToast("⚠️ נא למלא הכל");
+        if(editId) {
+            const i = entries.findIndex(e => e.id === editId);
+            entries[i] = {...entries[i], desc: d.value, amount: parseFloat(a.value), type: t.value};
+            editId = null; document.getElementById('saveBtn').innerText = "שמור";
+        } else {
+            entries.push({id: Date.now(), desc: d.value, amount: parseFloat(a.value), type: t.value, date: new Date(viewDate.getFullYear(), viewDate.getMonth(), 15).toISOString()});
+        }
+        d.value = ''; a.value = ''; save();
+    }
+
+    function editEntry(id) {
+        const e = entries.find(x => x.id === id);
+        document.getElementById('desc').value = e.desc;
+        document.getElementById('amount').value = e.amount;
+        document.getElementById('type').value = e.type;
+        editId = id; document.getElementById('saveBtn').innerText = "עדכן";
+    }
 
     function render() {
-        const months = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+        const mNames = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
         const m = viewDate.getMonth(), y = viewDate.getFullYear();
-        document.getElementById('monthLabel').innerText = `${months[m]} ${y}`;
+        document.getElementById('monthLabel').innerText = `${mNames[m]} ${y}`;
 
         const monthEntries = entries.filter(e => {
             const d = new Date(e.date);
             return d.getMonth() === m && d.getFullYear() === y;
         });
 
-        const list = document.getElementById('list');
-        list.innerHTML = '';
         let inc = 0, exp = 0, fix = 0;
-
+        const list = document.getElementById('list'); list.innerHTML = '';
+        
         monthEntries.forEach(e => {
-            if (e.type === 'income') inc += e.amount; 
-            else if (e.type === 'expense') exp += e.amount;
-            else fix += e.amount;
+            if(e.type==='income') inc+=e.amount; else if(e.type==='expense') exp+=e.amount; else fix+=e.amount;
         });
 
-        const filteredEntries = currentFilter === 'all' ? monthEntries : monthEntries.filter(e => e.type === currentFilter);
-        const icons = { income: '💰', expense: '💸', fixed: '📅' };
+        const filtered = currentFilter === 'all' ? monthEntries : monthEntries.filter(x => x.type === currentFilter);
+        const icons = {income:'💰', expense:'💸', fixed:'📅'};
 
-        filteredEntries.sort((a,b) => b.id - a.id).forEach(e => {
+        filtered.sort((a,b) => b.id - a.id).forEach(e => {
             list.innerHTML += `
                 <div class="item ${e.type}">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span>${icons[e.type]}</span>
-                        <span>${e.desc}</span>
-                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">${icons[e.type]} ${e.desc}</div>
                     <div style="display:flex; align-items:center; gap:12px;">
-                        <div style="font-weight:700; font-family:monospace;">₪${e.amount.toLocaleString()}</div>
-                        <div style="opacity:0.5; display:flex; gap:10px;">
-                            <button onclick="editEntry(${e.id})" style="background:none; border:none; cursor:pointer;">✏️</button>
-                            <button onclick="openDeleteModal(${e.id})" style="background:none; border:none; cursor:pointer;">🗑️</button>
-                        </div>
+                        <b>₪${e.amount.toLocaleString()}</b>
+                        <button onclick="editEntry(${e.id})" style="background:none; border:none; cursor:pointer;">✏️</button>
+                        <button onclick="openDeleteModal(${e.id})" style="background:none; border:none; cursor:pointer;">🗑️</button>
                     </div>
                 </div>`;
         });
@@ -307,73 +263,46 @@
         document.getElementById('sumExpense').innerText = `₪${exp.toLocaleString()}`;
         document.getElementById('sumFixed').innerText = `₪${fix.toLocaleString()}`;
         const bal = inc - (exp + fix);
-        const balEl = document.getElementById('sumBalance');
-        balEl.innerText = `₪${bal.toLocaleString()}`;
-        balEl.style.color = bal >= 0 ? 'var(--balance)' : 'var(--expense)';
-        updateChart(inc, exp, fix);
-    }
-
-    function updateChart(inc, exp, fix) {
+        document.getElementById('sumBalance').innerText = `₪${bal.toLocaleString()}`;
+        document.getElementById('sumBalance').style.color = bal >= 0 ? 'var(--balance)' : 'var(--expense)';
+        
         const ctx = document.getElementById('budgetChart').getContext('2d');
-        if (myChart) myChart.destroy();
-        const noData = inc === 0 && exp === 0 && fix === 0;
+        if(myChart) myChart.destroy();
         myChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['הכנסות', 'הוצאות', 'קבוע'],
                 datasets: [{
-                    data: noData ? [1] : [inc, exp, fix],
-                    backgroundColor: noData ? ['#1e293b'] : ['#22c55e', '#ef4444', '#f59e0b'],
+                    data: (inc||exp||fix) ? [inc, exp, fix] : [1],
+                    backgroundColor: (inc||exp||fix) ? ['#22c55e', '#ef4444', '#f59e0b'] : ['#1e293b'],
                     borderWidth: 0
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '80%', animation: { animateRotate: true, duration: 600 } }
+            options: { cutout: '75%', plugins: { legend: { display: false } } }
         });
     }
 
     function exportJSON() {
-        const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `budget_backup_${new Date().toLocaleDateString()}.json`;
-        a.click();
+        const blob = new Blob([JSON.stringify(entries)], {type:'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'budget_bak.json'; a.click();
     }
-
+    
     function exportCSV() {
-        let csvContent = "\uFEFF תאריך,תיאור,סוג,סכום\n";
-        entries.forEach(e => {
-            const date = new Date(e.date).toLocaleDateString('he-IL');
-            const typeHeb = e.type === 'income' ? 'הכנסה' : (e.type === 'expense' ? 'הוצאה' : 'קבוע');
-            csvContent += `${date},${e.desc},${typeHeb},${e.amount}\n`;
-        });
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `תקציב_אלכסנדר_2026.csv`;
-        a.click();
+        let csv = "\uFEFFתאריך,תיאור,סכום\n";
+        entries.forEach(e => csv += `${new Date(e.date).toLocaleDateString()},${e.desc},${e.amount}\n`);
+        const blob = new Blob([csv], {type:'text/csv'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'budget.csv'; a.click();
     }
 
-    function smartMerge(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    function smartMerge(ev) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            try {
-                const imported = JSON.parse(e.target.result);
-                if (Array.isArray(imported)) {
-                    let n = 0, u = 0;
-                    imported.forEach(ne => {
-                        const idx = entries.findIndex(old => old.id === ne.id);
-                        if (idx !== -1) { entries[idx] = ne; u++; }
-                        else { entries.push(ne); n++; }
-                    });
-                    save();
-                    alert(`מיזוג הושלם!\nנוספו: ${n}, עודכנו: ${u}`);
-                }
-            } catch(err) { alert("שגיאה בקובץ."); }
+            const data = JSON.parse(e.target.result);
+            data.forEach(ne => { if(!entries.find(old => old.id === ne.id)) entries.push(ne); });
+            save(); alert("המיזוג הושלם!");
         };
-        reader.readAsText(file);
+        reader.readAsText(ev.target.files[0]);
     }
+
     render();
 </script>
 </body>
